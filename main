@@ -1,0 +1,712 @@
+import javax.swing.*;
+import java.awt.event.*;
+import java.util.Random;
+import java.awt.*;
+
+public class main extends JFrame implements ActionListener {
+
+	JFrame window;
+	JPanel mainMenuPanel, characterCreationPanel, classSelectionPanel, enterNamePanel, introductionPanel, townPanel,
+			townSelectPanel, dungeonPanel, dungeonOptionsPanel, dungeonEnemyDefeatedPanel, weaponShopPanel,
+			currentWeaponDisplay;
+	JButton newGame, continueGame, quitGame, confirmClass, confirmPlayerName, continueIntro, continueIntro2, weaponShop,
+			armorShop, dungeonEntrance, dungeonLightAttack, dungeonHeavyAttack, dungeonSpecialMove, dungeonFlee,
+			dungeonContinue, dungeonLeave, continueBoss1;
+	JLabel title, classSelection, warriorBio, mercenaryBio, paladinBio, enterName, currentEnemyName, currentEnemyHealth,
+			playerHealthLabel, playerNameLabel, goldCounter, currentRoom;
+	JRadioButton warriorClass, mercenaryClass, paladinClass;
+	JTextField playerName;
+	private static JDialog intro1, intro2, boss1;
+	Font titleFont = new Font("Times New Roman", Font.PLAIN, 84);
+	static Font textFont = new Font("Times New Roman", Font.PLAIN, 32);
+	int playerHealth, playerDamage, playerSpeed, playerAccuracy, playerGold, currentPlayerHealth, specialMoveCounter;
+	String name, build;
+	String[] weaponNames = {"Rock","Wooden Club","Pitchfork","Knuckle Dusters","Spade","Pickaxe","Hatchet","Scabbard","Mace","Sword","Dagger","Pike","Halberd","Hammer","Great Sword"};
+	int[] weaponPrices = {0,50,75,125,150,225,275,350,450,550,625,700,1050,1550,1750};
+	int[] weaponDamage = {5,7,10,12,14,18,20,24,28,32,36,38,44,50};
+	static String[] floor1Enemies = { "Skeleton", "Undead Soldier", "Cursed Tombstone", "Graverobber", "Banshee" };
+	static int[] floor1Stats = { 13, 4, 2, 67 };
+
+	// Random Generator
+	Random generator = new Random(System.currentTimeMillis());
+	int rand, roomCounter;
+
+	// Dungeon Enemy Stats
+	String currentEnemy = "";
+	int enemyH, enemyS, enemySp, enemyAcc;
+
+	// Creation of the different panels
+	main() {
+		// Main Menu Panel
+		mainMenuPanel = new JPanel();
+		mainMenuPanel.setBounds(0, 0, 900, 650);
+		mainMenuPanel.setBackground(Color.black);
+		mainMenuPanel.setLayout(null);
+		newGame = new JButton("New Game");
+		newGame.setBounds(350, 280, 200, 50);
+		newGame.setBackground(Color.gray);
+		newGame.addActionListener(this);
+		mainMenuPanel.add(newGame);
+		continueGame = new JButton("Continue Game");
+		continueGame.setBounds(350, 350, 200, 50);
+		continueGame.setBackground(Color.gray);
+		continueGame.addActionListener(this);
+		mainMenuPanel.add(continueGame);
+		quitGame = new JButton("Quit Game");
+		quitGame.setBounds(350, 420, 200, 50);
+		quitGame.setBackground(Color.gray);
+		quitGame.addActionListener(this);
+		mainMenuPanel.add(quitGame);
+		title = new JLabel("Bozo Legends");
+		title.setFont(titleFont);
+		title.setForeground(Color.yellow);
+		title.setBounds(230, 100, 500, 100);
+		mainMenuPanel.add(title);
+		mainMenuPanel.setVisible(true);
+
+		// Character Creation Panel
+		characterCreationPanel = new JPanel();
+		characterCreationPanel.setBounds(0, 0, 900, 650);
+		characterCreationPanel.setBackground(Color.black);
+		characterCreationPanel.setLayout(null);
+		classSelectionPanel = new JPanel();
+		classSelectionPanel.setBounds(45, 90, 800, 350);
+		classSelectionPanel.setBackground(Color.gray);
+		classSelectionPanel.setLayout(null);
+		classSelectionPanel.setVisible(false);
+		characterCreationPanel.add(classSelectionPanel);
+		classSelection = new JLabel("Select a class:");
+		classSelection.setFont(textFont);
+		classSelection.setBounds(20, 30, 200, 30);
+		classSelectionPanel.add(classSelection);
+		warriorClass = new JRadioButton("Warrior");
+		warriorClass.setBounds(100, 80, 100, 30);
+		mercenaryClass = new JRadioButton("Mercenary");
+		mercenaryClass.setBounds(220, 80, 100, 30);
+		paladinClass = new JRadioButton("Paladin");
+		paladinClass.setBounds(340, 80, 100, 30);
+		ButtonGroup classSelectionButtons = new ButtonGroup();
+		classSelectionButtons.add(warriorClass);
+		classSelectionButtons.add(mercenaryClass);
+		classSelectionButtons.add(paladinClass);
+		classSelectionPanel.add(warriorClass);
+		classSelectionPanel.add(mercenaryClass);
+		classSelectionPanel.add(paladinClass);
+		warriorBio = new JLabel("Warriors are well rounded fighters with even stats");
+		warriorBio.setBounds(100, 120, 900, 30);
+		mercenaryBio = new JLabel("Mercenarys like to focus more on brute strength "
+				+ "than protecting themselves, so they generally get hurt easier");
+		mercenaryBio.setBounds(100, 150, 900, 30);
+		paladinBio = new JLabel("Paladins believe that nothing can pierce their iron " + "will, or their iron armor");
+		paladinBio.setBounds(100, 180, 900, 30);
+		classSelectionPanel.add(warriorBio);
+		classSelectionPanel.add(mercenaryBio);
+		classSelectionPanel.add(paladinBio);
+		classSelectionPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		confirmClass = new JButton("Confirm Class");
+		confirmClass.setBounds(325, 270, 150, 50);
+		confirmClass.addActionListener(this);
+		classSelectionPanel.add(confirmClass);
+		enterNamePanel = new JPanel();
+		enterNamePanel.setBounds(45, 90, 800, 350);
+		enterNamePanel.setBackground(Color.gray);
+		enterNamePanel.setLayout(null);
+		enterNamePanel.setVisible(false);
+		enterNamePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		characterCreationPanel.add(enterNamePanel);
+		enterName = new JLabel("Enter your character's name:");
+		enterName.setFont(textFont);
+		enterName.setBounds(230, 80, 400, 50);
+		enterNamePanel.add(enterName);
+		playerName = new JTextField("");
+		playerName.setBounds(210, 150, 400, 30);
+		enterNamePanel.add(playerName);
+		confirmPlayerName = new JButton("Confirm Name");
+		confirmPlayerName.setBounds(325, 270, 150, 50);
+		confirmPlayerName.addActionListener(this);
+		enterNamePanel.add(confirmPlayerName);
+		characterCreationPanel.setVisible(false);
+
+		// Introduction Panel
+		introductionPanel = new JPanel();
+		introductionPanel.setBounds(0, 0, 900, 650);
+		introductionPanel.setBackground(Color.black);
+		introductionPanel.setLayout(null);
+		intro1 = new JDialog(window, "Introduction", true);
+		intro1.setLayout(new FlowLayout());
+		continueIntro = new JButton("Continue");
+		continueIntro.addActionListener(this);
+		intro1.add(new JLabel("Long long ago, there was legend of a true bozo warrior."));
+		intro1.add(new JLabel("He was fabled to be the strongest in the land, with weapons of mass destruction"));
+		intro1.add(new JLabel("that could only be dreamt up by the imagination. After his time passed,"));
+		intro1.add(new JLabel("darkness rose again to reclaim their lost kingdom. It is up to you now intrepid"));
+		intro1.add(new JLabel("adventurer. Reclaim our land! Slay the four Kings of Darkness! SAVE US!"));
+		intro1.add(continueIntro);
+		intro1.setSize(550, 200);
+		intro2 = new JDialog(window, "Introduction", false);
+		intro2.setLayout(new FlowLayout());
+		continueIntro2 = new JButton("Continue");
+		continueIntro2.addActionListener(this);
+		intro2.add(new JLabel("'You...adventurer...what is your name? Not a speaker, eh? Hm. Peculiar."));
+		intro2.add(new JLabel("You seek to save us yet from this dire situation we find ourselves in, yes?"));
+		intro2.add(new JLabel("Well in that case you will need tools. Head to town down the road from here."));
+		intro2.add(new JLabel("There you will find multiple shops with the things you will need. And here, take"));
+		intro2.add(new JLabel("this gold to start you off. It should be enough to get yourself a weapon. Good luck.'"));
+		intro2.add(continueIntro2);
+		intro2.setSize(550, 200);
+		introductionPanel.setVisible(false);
+
+		// Boss 1
+		boss1 = new JDialog(window, "Floor Boss", false);
+		boss1.setLayout(new FlowLayout());
+		continueBoss1 = new JButton("Continue");
+		continueBoss1.addActionListener(this);
+		boss1.add(new JLabel("You walk to the end of the graveyard to find a large shadow looming over you."));
+		boss1.add(new JLabel("The shadow notices you and begins to grow bigger as it approaches."));
+		boss1.add(new JLabel("All of a sudden, the shadow shrinks, and a small gnome appears in the doorway"));
+		boss1.add(new JLabel("wielding a tiny hammer. He yells 'GIMME THEM TOES BITCH"));
+		boss1.add(continueBoss1);
+		boss1.setSize(550, 200);
+
+		// Town Panel
+		townPanel = new JPanel();
+		townPanel.setBounds(0, 0, 900, 650);
+		townPanel.setBackground(Color.black);
+		townPanel.setLayout(null);
+		townSelectPanel = new JPanel();
+		townSelectPanel.setBounds(45, 220, 800, 350);
+		townSelectPanel.setBackground(Color.gray);
+		townSelectPanel.setLayout(null);
+		townSelectPanel.setVisible(false);
+		townSelectPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		townPanel.add(townSelectPanel);
+		weaponShop = new JButton("Weapon Shop");
+		weaponShop.setBounds(50, 80, 200, 50);
+		weaponShop.addActionListener(this);
+		townSelectPanel.add(weaponShop);
+		armorShop = new JButton("Armor Shop");
+		armorShop.setBounds(50, 160, 200, 50);
+		armorShop.addActionListener(this);
+		townSelectPanel.add(armorShop);
+		dungeonEntrance = new JButton("Dungeon Entrance");
+		dungeonEntrance.setBounds(50, 240, 200, 50);
+		dungeonEntrance.addActionListener(this);
+		townSelectPanel.add(dungeonEntrance);
+		goldCounter = new JLabel("");
+		goldCounter.setBounds(550, 10, 300, 80);
+		goldCounter.setFont(textFont);
+		goldCounter.setForeground(Color.yellow);
+		goldCounter.setHorizontalAlignment(SwingConstants.RIGHT);
+		townPanel.add(goldCounter);
+		townPanel.setVisible(false);
+
+		// Dungeon Panel
+		dungeonPanel = new JPanel();
+		dungeonPanel.setBounds(0, 0, 900, 650);
+		dungeonPanel.setBackground(Color.black);
+		dungeonPanel.setLayout(null);
+		dungeonOptionsPanel = new JPanel();
+		dungeonOptionsPanel.setBounds(45, 270, 800, 290);
+		dungeonOptionsPanel.setBackground(Color.gray);
+		dungeonOptionsPanel.setLayout(null);
+		dungeonOptionsPanel.setVisible(false);
+		dungeonOptionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		dungeonPanel.add(dungeonOptionsPanel);
+		dungeonLightAttack = new JButton("Light Attack");
+		dungeonLightAttack.setBounds(10, 30, 380, 100);
+		dungeonLightAttack.addActionListener(this);
+		dungeonOptionsPanel.add(dungeonLightAttack);
+		dungeonHeavyAttack = new JButton("Heavy Attack");
+		dungeonHeavyAttack.setBounds(410, 30, 380, 100);
+		dungeonHeavyAttack.addActionListener(this);
+		dungeonOptionsPanel.add(dungeonHeavyAttack);
+		dungeonSpecialMove = new JButton("Special Move");
+		dungeonSpecialMove.setBounds(10, 150, 380, 100);
+		dungeonSpecialMove.addActionListener(this);
+		dungeonOptionsPanel.add(dungeonSpecialMove);
+		dungeonFlee = new JButton("Flee");
+		dungeonFlee.setBounds(410, 150, 380, 100);
+		dungeonFlee.addActionListener(this);
+		dungeonOptionsPanel.add(dungeonFlee);
+		currentEnemyName = new JLabel("");
+		currentEnemyName.setBounds(50, 30, 300, 80);
+		currentEnemyName.setFont(textFont);
+		currentEnemyName.setForeground(Color.white);
+		currentEnemyHealth = new JLabel("");
+		currentEnemyHealth.setBounds(50, 120, 300, 80);
+		currentEnemyHealth.setFont(textFont);
+		currentEnemyHealth.setForeground(Color.white);
+		dungeonPanel.add(currentEnemyName);
+		dungeonPanel.add(currentEnemyHealth);
+		playerNameLabel = new JLabel("");
+		playerNameLabel.setBounds(540, 30, 300, 80);
+		playerNameLabel.setFont(textFont);
+		playerNameLabel.setForeground(Color.white);
+		playerNameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		playerHealthLabel = new JLabel("");
+		playerHealthLabel.setBounds(540, 120, 300, 80);
+		playerHealthLabel.setFont(textFont);
+		playerHealthLabel.setForeground(Color.white);
+		playerHealthLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		dungeonPanel.add(playerNameLabel);
+		dungeonPanel.add(playerHealthLabel);
+		dungeonEnemyDefeatedPanel = new JPanel();
+		dungeonEnemyDefeatedPanel.setBounds(45, 270, 800, 290);
+		dungeonEnemyDefeatedPanel.setBackground(Color.gray);
+		dungeonEnemyDefeatedPanel.setLayout(null);
+		dungeonEnemyDefeatedPanel.setVisible(false);
+		dungeonEnemyDefeatedPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		dungeonPanel.add(dungeonEnemyDefeatedPanel);
+		dungeonContinue = new JButton("Delve Deeper");
+		dungeonContinue.setBounds(10, 100, 380, 100);
+		dungeonContinue.addActionListener(this);
+		dungeonLeave = new JButton("Return to Town");
+		dungeonLeave.setBounds(410, 100, 380, 100);
+		dungeonLeave.addActionListener(this);
+		dungeonEnemyDefeatedPanel.add(dungeonContinue);
+		dungeonEnemyDefeatedPanel.add(dungeonLeave);
+		currentRoom = new JLabel("Room 1");
+		currentRoom.setBounds(50, 0, 300, 80);
+		currentRoom.setFont(textFont);
+		currentRoom.setForeground(Color.white);
+		dungeonPanel.add(currentRoom);
+		dungeonPanel.setVisible(false);
+
+		// Weapon Shop
+		weaponShopPanel = new JPanel();
+		weaponShopPanel.setBounds(0, 0, 900, 650);
+		weaponShopPanel.setBackground(Color.black);
+		weaponShopPanel.setLayout(null);
+		currentWeaponDisplay = new JPanel();
+		currentWeaponDisplay.setBounds(245, 50, 400, 500);
+		currentWeaponDisplay.setBackground(Color.gray);
+		currentWeaponDisplay.setLayout(null);
+		currentWeaponDisplay.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		weaponShopPanel.add(currentWeaponDisplay);
+
+		// JFrame Settings
+		window = new JFrame("Bozo Legends");
+		window.setSize(900, 650);
+		window.setLayout(null);
+		window.setVisible(true);
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setResizable(false);
+
+		// Adding Panels to JFrame
+		window.add(mainMenuPanel);
+		window.add(characterCreationPanel);
+		window.add(introductionPanel);
+		window.add(townPanel);
+		window.add(dungeonPanel);
+		window.add(weaponShopPanel);
+	}
+
+	// Make game happen
+	public static void main(String[] args) {
+		new main();
+	}
+
+	// When button is pressed, do the thing
+	public void actionPerformed(ActionEvent e) {
+		// New Game Button
+		if (e.getSource() == newGame) {
+			mainMenuPanel.setVisible(false);
+			characterCreationPanel.setVisible(true);
+			classSelectionPanel.setVisible(true);
+		}
+
+		// Continue Game Button
+		if (e.getSource() == continueGame) {
+
+		}
+
+		// Quit Game Button
+		if (e.getSource() == quitGame) {
+			System.exit(0);
+		}
+
+		// Confirm Class Button
+		if (e.getSource() == confirmClass) {
+			if (warriorClass.isSelected()) {
+				playerHealth = 18;
+				playerDamage = 2;
+				playerSpeed = 4;
+				playerAccuracy = 84;
+				build = "warrior";
+				classSelectionPanel.setVisible(false);
+				enterNamePanel.setVisible(true);
+			} else if (mercenaryClass.isSelected()) {
+				playerHealth = 14;
+				playerDamage = 3;
+				playerSpeed = 1;
+				playerAccuracy = 72;
+				build = "mercenary";
+				classSelectionPanel.setVisible(false);
+				enterNamePanel.setVisible(true);
+			} else if (paladinClass.isSelected()) {
+				playerHealth = 22;
+				playerDamage = 1;
+				playerSpeed = 2;
+				playerAccuracy = 80;
+				build = "paladin";
+				classSelectionPanel.setVisible(false);
+				enterNamePanel.setVisible(true);
+			} else
+				JOptionPane.showMessageDialog(this, "Please select a class");
+		}
+
+		// Confirm Player Name
+		if (e.getSource() == confirmPlayerName) {
+			if (playerName.getText().equals("")) {
+				JOptionPane.showMessageDialog(this, "Please input a name");
+			} else {
+				name = playerName.getText();
+				enterNamePanel.setVisible(false);
+				characterCreationPanel.setVisible(false);
+				introductionPanel.setVisible(true);
+				intro1.setVisible(true);
+			}
+		}
+
+		// Continue Intro
+		if (e.getSource() == continueIntro) {
+			main.intro1.setVisible(false);
+			main.intro2.setVisible(true);
+		}
+		if (e.getSource() == continueIntro2) {
+			main.intro2.setVisible(false);
+			introductionPanel.setVisible(false);
+			townPanel.setVisible(true);
+			townSelectPanel.setVisible(true);
+			playerGold = 50;
+			goldCounter.setText("Gold: " + playerGold);
+		}
+
+		// Town Buttons
+		// Weapon Shop
+		if (e.getSource() == weaponShop) {
+			weaponShopPanel.setVisible(true);
+			townPanel.setVisible(false);
+		}
+		// Armor Shop
+		if (e.getSource() == armorShop) {
+
+		}
+		// DungeonEntrance
+		if (e.getSource() == dungeonEntrance) {
+			townPanel.setVisible(false);
+			dungeonPanel.setVisible(true);
+			dungeonOptionsPanel.setVisible(true);
+			rand = generator.nextInt(4);
+			currentEnemy = floor1Enemies[rand];
+			enemyH = floor1Stats[0] + 1;
+			enemyS = generator.nextInt(floor1Stats[1]) + 1;
+			enemySp = generator.nextInt(floor1Stats[2]) + 1;
+			enemyAcc = floor1Stats[3] + 1;
+			currentEnemyName.setText(currentEnemy);
+			currentEnemyHealth.setText("Enemy HP: " + enemyH);
+			playerNameLabel.setText(name);
+			playerHealthLabel.setText("Your HP: " + playerHealth);
+			currentPlayerHealth = playerHealth;
+			specialMoveCounter = 2;
+			roomCounter = 1;
+			currentRoom.setText("Room 1");
+			if (playerSpeed < enemySp) {
+				currentPlayerHealth = currentPlayerHealth - enemyS;
+				JOptionPane.showMessageDialog(this, "The enemy was faster than you and struck first!");
+			}
+		}
+
+		// Dungeon Options
+		if (e.getSource() == dungeonLightAttack) {
+			int damageDealt = playerDamage;
+			int damageTaken = enemyS;
+			boolean enemyHit = false;
+			boolean playerHit = false;
+			if (generator.nextInt(100) <= playerAccuracy) {
+				if (generator.nextInt(8) == 1) {
+					damageDealt = damageDealt * 2;
+				}
+				enemyH = enemyH - damageDealt;
+				currentEnemyHealth.setText("Enemy HP: " + enemyH);
+				playerHit = true;
+			}
+			if (generator.nextInt(100) <= enemyAcc && enemyH > 0) {
+				currentPlayerHealth = currentPlayerHealth - damageTaken;
+				playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
+				enemyHit = true;
+			}
+			if (enemyHit && playerHit) {
+				JOptionPane.showMessageDialog(this,
+						"You took " + damageTaken + " damage, and dealt " + damageDealt + " damage!");
+			} else if (enemyHit && !playerHit) {
+				JOptionPane.showMessageDialog(this,
+						"You missed your attack and the enemy hit you for " + damageTaken + " damage!");
+			} else if (!enemyHit && playerHit) {
+				JOptionPane.showMessageDialog(this,
+						"The enemy missed their attack and you dealt " + damageDealt + " damage!");
+			} else {
+				JOptionPane.showMessageDialog(this, "How did both of you dumbasses miss.");
+			}
+			if (currentPlayerHealth <= 0) {
+				dungeonPanel.setVisible(false);
+				townPanel.setVisible(true);
+				JOptionPane.showMessageDialog(this,
+						"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
+				playerGold = playerGold - playerGold/3;
+				goldCounter.setText("Gold: " + playerGold);
+			}
+			if (enemyH <= 0) {
+				dungeonEnemyDefeatedPanel.setVisible(true);
+				dungeonOptionsPanel.setVisible(false);
+				if (roomCounter >= 10) {
+					JOptionPane.showMessageDialog(this,
+							"You have defeated the boss and completed this floor! You gained 50 gold!");
+					dungeonEnemyDefeatedPanel.setVisible(false);
+					dungeonOptionsPanel.setVisible(true);
+					dungeonPanel.setVisible(false);
+					townPanel.setVisible(true);
+					playerGold += 50;
+					goldCounter.setText("Gold: " + playerGold);
+				} else {
+					int tempGold = generator.nextInt(10) + 5;
+					JOptionPane.showMessageDialog(this, "You defeated the enemy and gained " + tempGold + " gold!");
+					playerGold += tempGold;
+				}
+			}
+		}
+		if (e.getSource() == dungeonHeavyAttack) {
+			int damageDealt = playerDamage;
+			int damageTaken = enemyS;
+			boolean enemyHit = false;
+			boolean playerHit = false;
+			if (generator.nextInt(100) <= playerAccuracy - 15) {
+				damageDealt = damageDealt + playerDamage;
+				if (generator.nextInt(8) == 1) {
+					damageDealt = damageDealt * 2;
+				}
+				enemyH = enemyH - damageDealt;
+				currentEnemyHealth.setText("Enemy HP: " + enemyH);
+				playerHit = true;
+			}
+			if (generator.nextInt(100) <= enemyAcc && enemyH > 0) {
+				currentPlayerHealth = currentPlayerHealth - damageTaken;
+				playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
+				enemyHit = true;
+			}
+			if (enemyHit && playerHit) {
+				JOptionPane.showMessageDialog(this,
+						"You took " + damageTaken + " damage, and dealt " + damageDealt + " damage!");
+			} else if (enemyHit && !playerHit) {
+				JOptionPane.showMessageDialog(this,
+						"You missed your attack and the enemy hit you for " + damageTaken + " damage!");
+			} else if (!enemyHit && playerHit) {
+				JOptionPane.showMessageDialog(this,
+						"The enemy missed their attack and you dealt " + damageDealt + " damage!");
+			} else {
+				JOptionPane.showMessageDialog(this, "How did both of you dumbasses miss.");
+			}
+			if (currentPlayerHealth <= 0) {
+				dungeonPanel.setVisible(false);
+				townPanel.setVisible(true);
+				JOptionPane.showMessageDialog(this,
+						"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
+				playerGold = playerGold - playerGold/3;
+				goldCounter.setText("Gold: " + playerGold);
+			}
+			if (enemyH <= 0) {
+				dungeonEnemyDefeatedPanel.setVisible(true);
+				dungeonOptionsPanel.setVisible(false);
+				if (roomCounter >= 10) {
+					JOptionPane.showMessageDialog(this,
+							"You have defeated the boss and completed this floor! You gained 50 gold!");
+					dungeonEnemyDefeatedPanel.setVisible(false);
+					dungeonOptionsPanel.setVisible(true);
+					dungeonPanel.setVisible(false);
+					townPanel.setVisible(true);
+					playerGold += 50;
+					goldCounter.setText("Gold: " + playerGold);
+				} else {
+					int tempGold = generator.nextInt(10) + 5;
+					JOptionPane.showMessageDialog(this, "You defeated the enemy and gained " + tempGold + " gold!");
+					playerGold += tempGold;
+				}
+			}
+		}
+		if (e.getSource() == dungeonSpecialMove) {
+			int damageDealt = playerDamage;
+			int damageTaken = enemyS;
+			boolean enemyHit = false;
+			boolean playerHit = false;
+			if (build.equals("warrior")) {
+				if (specialMoveCounter > 0) {
+					damageDealt = damageDealt * 2;
+					enemyH = enemyH - damageDealt;
+					currentEnemyHealth.setText("Enemy HP: " + enemyH);
+					playerHit = true;
+					specialMoveCounter--;
+					JOptionPane.showMessageDialog(this, "You double strike the enemy for " + damageDealt + " damage!");
+				} else {
+					JOptionPane.showMessageDialog(this,
+							"You can't do this anymore dummy, you used all your special skills!");
+				}
+				if (generator.nextInt(100) <= enemyAcc && enemyH > 0) {
+					currentPlayerHealth = currentPlayerHealth - damageTaken;
+					playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
+					enemyHit = true;
+				}
+				if (enemyHit && playerHit) {
+					JOptionPane.showMessageDialog(this,
+							"You took " + damageTaken + " damage, and you used your special move! You have "
+									+ specialMoveCounter + " uses left!");
+				} else if (enemyHit && !playerHit) {
+					JOptionPane.showMessageDialog(this,
+							"Your special move failed and the enemy hit you for " + damageTaken + " damage!");
+				} else if (!enemyHit && playerHit) {
+					JOptionPane.showMessageDialog(this,
+							"The enemy missed their attack and you used your special move! You have "
+									+ specialMoveCounter + " uses left!");
+				} else {
+					JOptionPane.showMessageDialog(this, "How did both of you dumbasses miss.");
+				}
+			} else if (build.equals("mercenary")) {
+				if (specialMoveCounter > 0) {
+					enemyH = enemyH - damageDealt;
+					currentEnemyHealth.setText("Enemy HP: " + enemyH);
+					specialMoveCounter--;
+					JOptionPane.showMessageDialog(this, "You dodged the enemies attack and hit them for " + damageDealt
+							+ " damage! You have " + specialMoveCounter + " uses left!");
+				} else {
+					JOptionPane.showMessageDialog(this,
+							"You can't do this anymore dummy, you used all your special skills!");
+				}
+			} else if (build.equals("paladin")) {
+				if (specialMoveCounter > 0) {
+					enemyH = enemyH - playerHealth / 4;
+					currentEnemyHealth.setText("Enemy HP: " + enemyH);
+					if (currentPlayerHealth + playerHealth / 4 > playerHealth) {
+						currentPlayerHealth = playerHealth;
+					} else {
+						currentPlayerHealth = currentPlayerHealth + playerHealth / 4;
+					}
+					playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
+					specialMoveCounter--;
+					JOptionPane.showMessageDialog(this,
+							"You stole some of the enemies life force and healed yourself for " + playerHealth / 4
+									+ " HP! The enemy was too drained to attack! You have " + specialMoveCounter
+									+ " uses left!");
+				} else {
+					JOptionPane.showMessageDialog(this,
+							"You can't do this anymore dummy, you used all your special skills!");
+				}
+			}
+			if (currentPlayerHealth <= 0) {
+				dungeonPanel.setVisible(false);
+				townPanel.setVisible(true);
+				JOptionPane.showMessageDialog(this,
+						"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
+				playerGold = playerGold - playerGold/3;
+				goldCounter.setText("Gold: " + playerGold);
+			}
+			if (enemyH <= 0) {
+				dungeonEnemyDefeatedPanel.setVisible(true);
+				dungeonOptionsPanel.setVisible(false);
+				if (roomCounter >= 10) {
+					JOptionPane.showMessageDialog(this,
+							"You have defeated the boss and completed this floor!  You gained 50 gold!");
+					dungeonEnemyDefeatedPanel.setVisible(false);
+					dungeonOptionsPanel.setVisible(true);
+					dungeonPanel.setVisible(false);
+					townPanel.setVisible(true);
+					playerGold += 50;
+					goldCounter.setText("Gold: " + playerGold);
+				} else {
+					int tempGold = generator.nextInt(10) + 5;
+					JOptionPane.showMessageDialog(this, "You defeated the enemy and gained " + tempGold + " gold!");
+					playerGold += tempGold;
+				}
+			}
+		}
+		if (e.getSource() == dungeonFlee) {
+			rand = generator.nextInt(4);
+			if (rand == 0 || rand == 1) {
+				currentPlayerHealth = currentPlayerHealth - enemyS;
+				playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
+				JOptionPane.showMessageDialog(this, "You were unable to escape and took " + enemyS + " damage!");
+				if (currentPlayerHealth <= 0) {
+					dungeonPanel.setVisible(false);
+					townPanel.setVisible(true);
+					JOptionPane.showMessageDialog(this,
+							"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
+				}
+			} else {
+				dungeonPanel.setVisible(false);
+				townPanel.setVisible(true);
+				JOptionPane.showMessageDialog(this, "You successfully escaped!");
+				goldCounter.setText("Gold: " + playerGold);
+			}
+		}
+
+		// Enemy Defeated Options
+		if (e.getSource() == dungeonContinue) {
+			roomCounter++;
+			dungeonOptionsPanel.setVisible(true);
+			dungeonEnemyDefeatedPanel.setVisible(false);
+			if (roomCounter <= 9) {
+				rand = generator.nextInt(4);
+				currentEnemy = floor1Enemies[rand];
+				enemyH = floor1Stats[0] + 1;
+				enemyS = generator.nextInt(floor1Stats[1]) + 1;
+				enemySp = generator.nextInt(floor1Stats[2]) + 1;
+				enemyAcc = floor1Stats[3] + 1;
+				currentRoom.setText("Room " + roomCounter);
+			} else {
+				boss1.setVisible(true);
+				currentEnemy = "Harold the Gnome";
+				enemyH = 20;
+				enemyS = 3;
+				enemySp = 5;
+				enemyAcc = 88;
+				currentRoom.setText("Boss room");
+			}
+			currentEnemyName.setText(currentEnemy);
+			currentEnemyHealth.setText("Enemy HP: " + enemyH);
+			playerNameLabel.setText(name);
+			playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
+			if (specialMoveCounter < 5) {
+				specialMoveCounter++;
+			}
+			if (playerSpeed < enemySp) {
+				currentPlayerHealth = currentPlayerHealth - enemyS;
+				playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
+				JOptionPane.showMessageDialog(this, "The enemy was faster than you and struck first!");
+				if (currentPlayerHealth <= 0) {
+					dungeonPanel.setVisible(false);
+					townPanel.setVisible(true);
+					JOptionPane.showMessageDialog(this,
+							"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
+					playerGold = playerGold - playerGold/3;
+					goldCounter.setText("Gold: " + playerGold);
+				}
+			}
+		}
+		if (e.getSource() == dungeonLeave) {
+			dungeonOptionsPanel.setVisible(true);
+			dungeonEnemyDefeatedPanel.setVisible(false);
+			dungeonPanel.setVisible(false);
+			townPanel.setVisible(true);
+			goldCounter.setText("Gold: " + playerGold);
+		}
+
+		// Boss1
+		if (e.getSource() == continueBoss1) {
+			main.boss1.setVisible(false);
+		}
+	}
+}
