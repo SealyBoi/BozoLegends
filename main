@@ -5,27 +5,69 @@ import java.awt.*;
 
 public class main extends JFrame implements ActionListener {
 
+	private static final long serialVersionUID = 1L;
 	JFrame window;
 	JPanel mainMenuPanel, characterCreationPanel, classSelectionPanel, enterNamePanel, introductionPanel, townPanel,
 			townSelectPanel, dungeonPanel, dungeonOptionsPanel, dungeonEnemyDefeatedPanel, weaponShopPanel,
-			currentWeaponDisplay;
+			currentWeaponDisplay, armorShopPanel, currentArmorDisplay, floorSelectPanel, floorSelectButtonsPanel;
 	JButton newGame, continueGame, quitGame, confirmClass, confirmPlayerName, continueIntro, continueIntro2, weaponShop,
 			armorShop, dungeonEntrance, dungeonLightAttack, dungeonHeavyAttack, dungeonSpecialMove, dungeonFlee,
-			dungeonContinue, dungeonLeave, continueBoss1;
+			dungeonContinue, dungeonLeave, continueBoss1, purchaseWeapon, equipWeapon, leaveWeaponShop, nextWeapon,
+			previousWeapon, purchaseArmor, equipArmor, leaveArmorShop, nextArmor, previousArmor, selectFloor,
+			leaveFloorSelection, continueBoss2, continueBoss3, continueBoss4, continueBoss5;
 	JLabel title, classSelection, warriorBio, mercenaryBio, paladinBio, enterName, currentEnemyName, currentEnemyHealth,
-			playerHealthLabel, playerNameLabel, goldCounter, currentRoom;
-	JRadioButton warriorClass, mercenaryClass, paladinClass;
+			playerHealthLabel, playerNameLabel, goldCounter, currentRoom, weaponName, weaponCost, weaponDamage,
+			weaponDisplayedCounter, armorName, armorCost, armorHealth, armorDisplayedCounter, townWeaponEquipped,
+			townArmorEquipped;
+	JRadioButton warriorClass, mercenaryClass, paladinClass, firstFloor, secondFloor, thirdFloor, fourthFloor,
+			fifthFloor;
 	JTextField playerName;
-	private static JDialog intro1, intro2, boss1;
+	private static JDialog intro1, intro2, boss1, boss2, boss3, boss4, boss5;
 	Font titleFont = new Font("Times New Roman", Font.PLAIN, 84);
 	static Font textFont = new Font("Times New Roman", Font.PLAIN, 32);
-	int playerHealth, playerDamage, playerSpeed, playerAccuracy, playerGold, currentPlayerHealth, specialMoveCounter;
+	Font shopFont = new Font("Times New Roman", Font.PLAIN, 24);
+	int playerHealth, playerDamage, playerSpeed, playerAccuracy, playerGold, currentPlayerHealth, specialMoveCounter,
+			currentFloor;
 	String name, build;
-	String[] weaponNames = {"Rock","Wooden Club","Pitchfork","Knuckle Dusters","Spade","Pickaxe","Hatchet","Scabbard","Mace","Sword","Dagger","Pike","Halberd","Hammer","Great Sword"};
-	int[] weaponPrices = {0,50,75,125,150,225,275,350,450,550,625,700,1050,1550,1750};
-	int[] weaponDamage = {5,7,10,12,14,18,20,24,28,32,36,38,44,50};
+
+	// Floor 1
 	static String[] floor1Enemies = { "Skeleton", "Undead Soldier", "Cursed Tombstone", "Graverobber", "Banshee" };
-	static int[] floor1Stats = { 13, 4, 2, 67 };
+	static int[] floor1Stats = { 23, 4, 2, 67 };
+
+	// Floor 2
+	static String[] floor2Enemies = { "Wolf", "Bear", "Deer", "Cougar", "Eagle" };
+	static int[] floor2Stats = { 36, 9, 3, 70 };
+
+	// Floor 3
+	static String[] floor3Enemies = { "Sorcerer", "Apprentice", "Mage", "Alchemist", "Thaumaturge" };
+	static int[] floor3Stats = { 44, 12, 5, 76 };
+
+	// Floor 4
+	static String[] floor4Enemies = { "Assassin", "Bandit", "Mercenary", "Poison Master", "Thief" };
+	static int[] floor4Stats = { 52, 16, 7, 82 };
+
+	// Floor 5
+	static String[] floor5Enemies = { "Shieldbearer", "Knight", "Squire", "Crusader", "Spearman" };
+	static int[] floor5Stats = { 60, 20, 9, 86 };
+
+	// Weapon List
+	String[] weaponNames = { "Rock", "Wooden Club", "Pitchfork", "Knuckle Dusters", "Spade", "Pickaxe", "Hatchet",
+			"Scabbard", "Mace", "Sword", "Dagger", "Pike", "Halberd", "Hammer", "Great Sword" };
+	int[] weaponPrices = { 50, 75, 150, 275, 400, 550, 675, 800, 975, 1200, 1500, 1800, 2250, 2750, 3500 };
+	int[] weaponDamages = { 5, 7, 10, 12, 14, 18, 20, 24, 28, 32, 36, 38, 44, 50, 56 };
+	int currWeaponDisplayed = 0, currEquippedWeapon = -1;
+	boolean[] weaponsPurchased = { false, false, false, false, false, false, false, false, false, false, false, false,
+			false, false, false };
+	String[] equippedWeapon = { "None", "0", "0" };
+
+	// Armor List
+	String[] armorNames = { "Leather Armor", "Scale Armor", "Plated Mail Armor", "Chainmail Armor", "Plated Iron Armor",
+			"Plated Steel Armor" };
+	int[] armorPrices = { 150, 300, 500, 800, 1000, 1500 };
+	int[] armorHealths = { 6, 12, 18, 24, 30, 36 };
+	int currArmorDisplayed = 0, currEquippedArmor = -1;
+	boolean[] armorsPurchased = { false, false, false, false, false, false };
+	String[] equippedArmor = { "None", "0", "0" };
 
 	// Random Generator
 	Random generator = new Random(System.currentTimeMillis());
@@ -143,6 +185,7 @@ public class main extends JFrame implements ActionListener {
 		intro1.add(new JLabel("that could only be dreamt up by the imagination. After his time passed,"));
 		intro1.add(new JLabel("darkness rose again to reclaim their lost kingdom. It is up to you now intrepid"));
 		intro1.add(new JLabel("adventurer. Reclaim our land! Slay the four Kings of Darkness! SAVE US!"));
+		intro1.setLocation(200, 200);
 		intro1.add(continueIntro);
 		intro1.setSize(550, 200);
 		intro2 = new JDialog(window, "Introduction", false);
@@ -154,6 +197,7 @@ public class main extends JFrame implements ActionListener {
 		intro2.add(new JLabel("Well in that case you will need tools. Head to town down the road from here."));
 		intro2.add(new JLabel("There you will find multiple shops with the things you will need. And here, take"));
 		intro2.add(new JLabel("this gold to start you off. It should be enough to get yourself a weapon. Good luck.'"));
+		intro2.setLocation(200, 200);
 		intro2.add(continueIntro2);
 		intro2.setSize(550, 200);
 		introductionPanel.setVisible(false);
@@ -167,8 +211,59 @@ public class main extends JFrame implements ActionListener {
 		boss1.add(new JLabel("The shadow notices you and begins to grow bigger as it approaches."));
 		boss1.add(new JLabel("All of a sudden, the shadow shrinks, and a small gnome appears in the doorway"));
 		boss1.add(new JLabel("wielding a tiny hammer. He yells 'GIMME THEM TOES BITCH"));
+		boss1.setLocation(200, 200);
 		boss1.add(continueBoss1);
 		boss1.setSize(550, 200);
+
+		// Boss 2
+		boss2 = new JDialog(window, "Floor Boss", false);
+		boss2.setLayout(new FlowLayout());
+		boss2.add(new JLabel("As the forest grows darker the trees grow closer together, making it"));
+		boss2.add(new JLabel("difficult to navigate the terrain. The trees suddenly part ways to reveal"));
+		boss2.add(new JLabel("a small clearing, with a tree standing tall in the center. The tree begins"));
+		boss2.add(new JLabel("to move, with no intention of letting you leave it's domain alive."));
+		boss2.setLocation(200, 200);
+		boss2.setSize(550, 200);
+		continueBoss2 = new JButton("Continue");
+		continueBoss2.addActionListener(this);
+		boss2.add(continueBoss2);
+
+		// Boss 3
+		boss3 = new JDialog(window, "Floor Boss", false);
+		boss3.setLayout(new FlowLayout());
+		boss3.add(new JLabel("The library halls converge into a main study area, with a cauldron in the"));
+		boss3.add(new JLabel("middle. Smoke begins to rise from the cauldron as an entity makes its"));
+		boss3.add(new JLabel("known. The being looks down upon you, ready to take you from this world."));
+		boss3.setLocation(200, 200);
+		boss3.setSize(550, 200);
+		continueBoss3 = new JButton("Continue");
+		continueBoss3.addActionListener(this);
+		boss3.add(continueBoss3);
+
+		// Boss 4
+		boss4 = new JDialog(window, "Floor Boss", false);
+		boss4.setLayout(new FlowLayout());
+		boss4.add(new JLabel("The shadows collect into one spot and form a man in a cloak. With dagger"));
+		boss4.add(new JLabel("in hand, he stares you down with a menacing grin. He extends his hand out"));
+		boss4.add(new JLabel("and beckons you forward to make the first move."));
+		boss4.setLocation(200, 200);
+		boss4.setSize(550, 200);
+		continueBoss4 = new JButton("Continue");
+		continueBoss4.addActionListener(this);
+		boss4.add(continueBoss4);
+
+		// Boss 5
+		boss5 = new JDialog(window, "Floor Boss", false);
+		boss5.setLayout(new FlowLayout());
+		boss5.add(new JLabel("The corridors lead you to the king's hall, where a knight in golden armor"));
+		boss5.add(new JLabel("awaits. 'It has been a while since I have faced a bozo of such renown', he"));
+		boss5.add(new JLabel("says. 'Come forth bozo. Prove the legends of you are as true as many make"));
+		boss5.add(new JLabel("them seem to be.'"));
+		boss5.setLocation(200, 200);
+		boss5.setSize(550, 200);
+		continueBoss5 = new JButton("Continue");
+		continueBoss5.addActionListener(this);
+		boss5.add(continueBoss5);
 
 		// Town Panel
 		townPanel = new JPanel();
@@ -200,8 +295,63 @@ public class main extends JFrame implements ActionListener {
 		goldCounter.setFont(textFont);
 		goldCounter.setForeground(Color.yellow);
 		goldCounter.setHorizontalAlignment(SwingConstants.RIGHT);
+		townWeaponEquipped = new JLabel("Weapon: Fists");
+		townWeaponEquipped.setBounds(40,10,500,80);
+		townWeaponEquipped.setFont(textFont);
+		townWeaponEquipped.setForeground(Color.white);
+		townWeaponEquipped.setHorizontalAlignment(SwingConstants.LEFT);
+		townArmorEquipped = new JLabel("Armor: None");
+		townArmorEquipped.setBounds(40,50,500,80);
+		townArmorEquipped.setFont(textFont);
+		townArmorEquipped.setForeground(Color.white);
+		townArmorEquipped.setHorizontalAlignment(SwingConstants.LEFT);
+		townPanel.add(townWeaponEquipped);
+		townPanel.add(townArmorEquipped);
 		townPanel.add(goldCounter);
 		townPanel.setVisible(false);
+
+		// Floor Select Panel
+		floorSelectPanel = new JPanel();
+		floorSelectPanel.setBounds(0, 0, 900, 650);
+		floorSelectPanel.setBackground(Color.black);
+		floorSelectPanel.setLayout(null);
+		floorSelectButtonsPanel = new JPanel();
+		floorSelectButtonsPanel.setBounds(300, 50, 300, 500);
+		floorSelectButtonsPanel.setBackground(Color.gray);
+		floorSelectButtonsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		floorSelectButtonsPanel.setLayout(null);
+		floorSelectPanel.add(floorSelectButtonsPanel);
+		firstFloor = new JRadioButton("Floor 1");
+		firstFloor.setBounds(100, 50, 100, 30);
+		secondFloor = new JRadioButton("Floor 2");
+		secondFloor.setBounds(100, 100, 100, 30);
+		thirdFloor = new JRadioButton("Floor 3");
+		thirdFloor.setBounds(100, 150, 100, 30);
+		fourthFloor = new JRadioButton("Floor 4");
+		fourthFloor.setBounds(100, 200, 100, 30);
+		fifthFloor = new JRadioButton("Floor 5");
+		fifthFloor.setBounds(100, 250, 100, 30);
+		ButtonGroup floorSelection = new ButtonGroup();
+		floorSelection.add(firstFloor);
+		floorSelection.add(secondFloor);
+		floorSelection.add(thirdFloor);
+		floorSelection.add(fourthFloor);
+		floorSelection.add(fifthFloor);
+		selectFloor = new JButton("Enter Floor");
+		selectFloor.setBounds(75, 375, 150, 30);
+		selectFloor.addActionListener(this);
+		leaveFloorSelection = new JButton("Return to Town");
+		leaveFloorSelection.setBounds(75, 425, 150, 30);
+		leaveFloorSelection.addActionListener(this);
+		floorSelectButtonsPanel.add(firstFloor);
+		floorSelectButtonsPanel.add(secondFloor);
+		floorSelectButtonsPanel.add(thirdFloor);
+		floorSelectButtonsPanel.add(fourthFloor);
+		floorSelectButtonsPanel.add(fifthFloor);
+		floorSelectButtonsPanel.add(selectFloor);
+		floorSelectButtonsPanel.add(leaveFloorSelection);
+		floorSelectPanel.setVisible(false);
 
 		// Dungeon Panel
 		dungeonPanel = new JPanel();
@@ -289,6 +439,111 @@ public class main extends JFrame implements ActionListener {
 		currentWeaponDisplay.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 		weaponShopPanel.add(currentWeaponDisplay);
+		weaponName = new JLabel();
+		weaponName.setBounds(50, 30, 300, 50);
+		weaponName.setFont(textFont);
+		weaponName.setForeground(Color.white);
+		weaponName.setHorizontalAlignment(SwingConstants.CENTER);
+		weaponCost = new JLabel();
+		weaponCost.setBounds(100, 75, 200, 30);
+		weaponCost.setFont(shopFont);
+		weaponCost.setForeground(Color.white);
+		weaponCost.setHorizontalAlignment(SwingConstants.CENTER);
+		weaponDamage = new JLabel();
+		weaponDamage.setBounds(100, 100, 200, 30);
+		weaponDamage.setFont(shopFont);
+		weaponDamage.setForeground(Color.white);
+		weaponDamage.setHorizontalAlignment(SwingConstants.CENTER);
+		currentWeaponDisplay.add(weaponName);
+		currentWeaponDisplay.add(weaponCost);
+		currentWeaponDisplay.add(weaponDamage);
+		purchaseWeapon = new JButton("Purchase Weapon");
+		purchaseWeapon.setBounds(100, 320, 200, 50);
+		purchaseWeapon.addActionListener(this);
+		equipWeapon = new JButton("Equip Weapon");
+		equipWeapon.setBounds(100, 320, 200, 50);
+		equipWeapon.addActionListener(this);
+		leaveWeaponShop = new JButton("Leave Shop");
+		leaveWeaponShop.setBounds(100, 390, 200, 50);
+		leaveWeaponShop.addActionListener(this);
+		currentWeaponDisplay.add(purchaseWeapon);
+		currentWeaponDisplay.add(equipWeapon);
+		currentWeaponDisplay.add(leaveWeaponShop);
+		equipWeapon.setVisible(false);
+		nextWeapon = new JButton(">");
+		nextWeapon.setBounds(650, 250, 50, 80);
+		nextWeapon.addActionListener(this);
+		nextWeapon.setBackground(Color.green);
+		previousWeapon = new JButton("<");
+		previousWeapon.setBounds(190, 250, 50, 80);
+		previousWeapon.addActionListener(this);
+		previousWeapon.setBackground(Color.darkGray);
+		weaponShopPanel.add(nextWeapon);
+		weaponShopPanel.add(previousWeapon);
+		weaponDisplayedCounter = new JLabel();
+		weaponDisplayedCounter.setBounds(150, 10, 100, 30);
+		weaponDisplayedCounter.setHorizontalAlignment(SwingConstants.CENTER);
+		currentWeaponDisplay.add(weaponDisplayedCounter);
+		weaponShopPanel.setVisible(false);
+
+		// Armor Shop
+		armorShopPanel = new JPanel();
+		armorShopPanel.setBounds(0, 0, 900, 650);
+		armorShopPanel.setBackground(Color.black);
+		armorShopPanel.setLayout(null);
+		currentArmorDisplay = new JPanel();
+		currentArmorDisplay.setBounds(245, 50, 400, 500);
+		currentArmorDisplay.setBackground(Color.gray);
+		currentArmorDisplay.setLayout(null);
+		currentArmorDisplay.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		armorShopPanel.add(currentArmorDisplay);
+		armorName = new JLabel();
+		armorName.setBounds(50, 30, 300, 50);
+		armorName.setFont(textFont);
+		armorName.setForeground(Color.white);
+		armorName.setHorizontalAlignment(SwingConstants.CENTER);
+		armorCost = new JLabel();
+		armorCost.setBounds(100, 75, 200, 30);
+		armorCost.setFont(shopFont);
+		armorCost.setForeground(Color.white);
+		armorCost.setHorizontalAlignment(SwingConstants.CENTER);
+		armorHealth = new JLabel();
+		armorHealth.setBounds(100, 100, 200, 30);
+		armorHealth.setFont(shopFont);
+		armorHealth.setForeground(Color.white);
+		armorHealth.setHorizontalAlignment(SwingConstants.CENTER);
+		currentArmorDisplay.add(armorName);
+		currentArmorDisplay.add(armorCost);
+		currentArmorDisplay.add(armorHealth);
+		purchaseArmor = new JButton("Purchase Armor");
+		purchaseArmor.setBounds(100, 320, 200, 50);
+		purchaseArmor.addActionListener(this);
+		equipArmor = new JButton("Equip Armor");
+		equipArmor.setBounds(100, 320, 200, 50);
+		equipArmor.addActionListener(this);
+		leaveArmorShop = new JButton("Leave Shop");
+		leaveArmorShop.setBounds(100, 390, 200, 50);
+		leaveArmorShop.addActionListener(this);
+		currentArmorDisplay.add(purchaseArmor);
+		currentArmorDisplay.add(equipArmor);
+		currentArmorDisplay.add(leaveArmorShop);
+		equipArmor.setVisible(false);
+		nextArmor = new JButton(">");
+		nextArmor.setBounds(650, 250, 50, 80);
+		nextArmor.addActionListener(this);
+		nextArmor.setBackground(Color.green);
+		previousArmor = new JButton("<");
+		previousArmor.setBounds(190, 250, 50, 80);
+		previousArmor.addActionListener(this);
+		previousArmor.setBackground(Color.darkGray);
+		armorShopPanel.add(nextArmor);
+		armorShopPanel.add(previousArmor);
+		armorDisplayedCounter = new JLabel();
+		armorDisplayedCounter.setBounds(150, 10, 100, 30);
+		armorDisplayedCounter.setHorizontalAlignment(SwingConstants.CENTER);
+		currentArmorDisplay.add(armorDisplayedCounter);
+		armorShopPanel.setVisible(false);
 
 		// JFrame Settings
 		window = new JFrame("Bozo Legends");
@@ -305,6 +560,8 @@ public class main extends JFrame implements ActionListener {
 		window.add(townPanel);
 		window.add(dungeonPanel);
 		window.add(weaponShopPanel);
+		window.add(armorShopPanel);
+		window.add(floorSelectPanel);
 	}
 
 	// Make game happen
@@ -339,6 +596,7 @@ public class main extends JFrame implements ActionListener {
 				playerSpeed = 4;
 				playerAccuracy = 84;
 				build = "warrior";
+				dungeonSpecialMove.setText("Health Potion");
 				classSelectionPanel.setVisible(false);
 				enterNamePanel.setVisible(true);
 			} else if (mercenaryClass.isSelected()) {
@@ -347,6 +605,7 @@ public class main extends JFrame implements ActionListener {
 				playerSpeed = 1;
 				playerAccuracy = 72;
 				build = "mercenary";
+				dungeonSpecialMove.setText("Double Strike");
 				classSelectionPanel.setVisible(false);
 				enterNamePanel.setVisible(true);
 			} else if (paladinClass.isSelected()) {
@@ -355,16 +614,17 @@ public class main extends JFrame implements ActionListener {
 				playerSpeed = 2;
 				playerAccuracy = 80;
 				build = "paladin";
+				dungeonSpecialMove.setText("Life Steal");
 				classSelectionPanel.setVisible(false);
 				enterNamePanel.setVisible(true);
 			} else
-				JOptionPane.showMessageDialog(this, "Please select a class");
+				JOptionPane.showMessageDialog(window, "Please select a class");
 		}
 
 		// Confirm Player Name
 		if (e.getSource() == confirmPlayerName) {
 			if (playerName.getText().equals("")) {
-				JOptionPane.showMessageDialog(this, "Please input a name");
+				JOptionPane.showMessageDialog(window, "Please input a name");
 			} else {
 				name = playerName.getText();
 				enterNamePanel.setVisible(false);
@@ -393,39 +653,337 @@ public class main extends JFrame implements ActionListener {
 		if (e.getSource() == weaponShop) {
 			weaponShopPanel.setVisible(true);
 			townPanel.setVisible(false);
+			weaponName.setText(weaponNames[0]);
+			weaponCost.setText(weaponPrices[0] + " Gold");
+			weaponDamage.setText((weaponDamages[0] - 2) + "-" + (weaponDamages[0] + 1) + " Damage");
+			currWeaponDisplayed = 0;
+			weaponDisplayedCounter.setText((currWeaponDisplayed + 1) + "/15");
+			previousWeapon.setBackground(Color.darkGray);
+			nextWeapon.setBackground(Color.green);
+			if (weaponsPurchased[0]) {
+				equipWeapon.setVisible(true);
+				purchaseWeapon.setVisible(false);
+				if (currWeaponDisplayed == currEquippedWeapon) {
+					equipWeapon.setText("Equipped");
+				} else {
+					equipWeapon.setText("Equip Weapon");
+				}
+			} else {
+				purchaseWeapon.setVisible(true);
+				equipWeapon.setVisible(false);
+			}
+		}
+		if (e.getSource() == purchaseWeapon) {
+			if (weaponPrices[currWeaponDisplayed] <= playerGold) {
+				playerGold = playerGold - weaponPrices[currWeaponDisplayed];
+				weaponsPurchased[currWeaponDisplayed] = true;
+				purchaseWeapon.setVisible(false);
+				equipWeapon.setVisible(true);
+				equipWeapon.setText("Equip Weapon");
+			} else {
+				JOptionPane.showMessageDialog(window, "You broke bitch, you don't have the money to buy that!");
+			}
+		}
+		if (e.getSource() == equipWeapon) {
+			equippedWeapon[0] = weaponNames[currWeaponDisplayed];
+			equippedWeapon[1] = "" + weaponPrices[currWeaponDisplayed];
+			equippedWeapon[2] = "" + weaponDamages[currWeaponDisplayed];
+			equipWeapon.setText("Equipped");
+			playerDamage = weaponDamages[currWeaponDisplayed];
+			currEquippedWeapon = currWeaponDisplayed;
+			townWeaponEquipped.setText("Weapon: " + equippedWeapon[0]);
+		}
+		if (e.getSource() == leaveWeaponShop) {
+			weaponShopPanel.setVisible(false);
+			townPanel.setVisible(true);
+			goldCounter.setText("Gold: " + playerGold);
+		}
+		if (e.getSource() == nextWeapon) {
+			if (currWeaponDisplayed < weaponNames.length - 1) {
+				currWeaponDisplayed++;
+				weaponDisplayedCounter.setText((currWeaponDisplayed + 1) + "/15");
+				weaponName.setText(weaponNames[currWeaponDisplayed]);
+				weaponCost.setText(weaponPrices[currWeaponDisplayed] + " Gold");
+				weaponDamage.setText((weaponDamages[currWeaponDisplayed] - 2) + "-"
+						+ (weaponDamages[currWeaponDisplayed] + 1) + " Damage");
+				if (currWeaponDisplayed >= weaponNames.length - 1) {
+					nextWeapon.setBackground(Color.darkGray);
+				}
+				previousWeapon.setBackground(Color.green);
+				if (weaponsPurchased[currWeaponDisplayed]) {
+					equipWeapon.setVisible(true);
+					purchaseWeapon.setVisible(false);
+					if (currEquippedWeapon == currWeaponDisplayed) {
+						equipWeapon.setText("Equipped");
+					} else {
+						equipWeapon.setText("Equip Weapon");
+					}
+				} else {
+					purchaseWeapon.setVisible(true);
+					equipWeapon.setVisible(false);
+				}
+			}
+		}
+		if (e.getSource() == previousWeapon) {
+			if (currWeaponDisplayed > 0) {
+				currWeaponDisplayed--;
+				weaponDisplayedCounter.setText((currWeaponDisplayed + 1) + "/15");
+				weaponName.setText(weaponNames[currWeaponDisplayed]);
+				weaponCost.setText(weaponPrices[currWeaponDisplayed] + " Gold");
+				weaponDamage.setText((weaponDamages[currWeaponDisplayed] - 2) + "-"
+						+ (weaponDamages[currWeaponDisplayed] + 1) + " Damage");
+				if (currWeaponDisplayed <= 0) {
+					previousWeapon.setBackground(Color.darkGray);
+				}
+				nextWeapon.setBackground(Color.green);
+				if (weaponsPurchased[currWeaponDisplayed]) {
+					equipWeapon.setVisible(true);
+					purchaseWeapon.setVisible(false);
+					if (currEquippedWeapon == currWeaponDisplayed) {
+						equipWeapon.setText("Equipped");
+					} else {
+						equipWeapon.setText("Equip Weapon");
+					}
+				} else {
+					purchaseWeapon.setVisible(true);
+					equipWeapon.setVisible(false);
+				}
+			}
 		}
 		// Armor Shop
 		if (e.getSource() == armorShop) {
-
+			armorShopPanel.setVisible(true);
+			townPanel.setVisible(false);
+			armorName.setText(armorNames[0]);
+			armorCost.setText(armorPrices[0] + " Gold");
+			armorHealth.setText(armorHealths[0] + " Extra Health");
+			currArmorDisplayed = 0;
+			armorDisplayedCounter.setText((currArmorDisplayed + 1) + "/6");
+			previousArmor.setBackground(Color.darkGray);
+			nextArmor.setBackground(Color.green);
+			if (armorsPurchased[0]) {
+				equipArmor.setVisible(true);
+				purchaseArmor.setVisible(false);
+				if (currArmorDisplayed == currEquippedArmor) {
+					equipArmor.setText("Equipped");
+				} else {
+					equipArmor.setText("Equip Armor");
+				}
+			} else {
+				purchaseArmor.setVisible(true);
+				equipArmor.setVisible(false);
+			}
+		}
+		if (e.getSource() == purchaseArmor) {
+			if (armorPrices[currArmorDisplayed] <= playerGold) {
+				playerGold = playerGold - armorPrices[currArmorDisplayed];
+				armorsPurchased[currArmorDisplayed] = true;
+				purchaseArmor.setVisible(false);
+				equipArmor.setVisible(true);
+				equipArmor.setText("Equip Armor");
+			} else {
+				JOptionPane.showMessageDialog(window, "You broke bitch, you don't have the money to buy that!");
+			}
+		}
+		if (e.getSource() == equipArmor) {
+			playerHealth = playerHealth - Integer.parseInt(equippedArmor[2]);
+			equippedArmor[0] = armorNames[currArmorDisplayed];
+			equippedArmor[1] = "" + armorPrices[currArmorDisplayed];
+			equippedArmor[2] = "" + armorHealths[currArmorDisplayed];
+			equipArmor.setText("Equipped");
+			playerHealth = playerHealth + Integer.parseInt(equippedArmor[2]);
+			currEquippedArmor = currArmorDisplayed;
+			townArmorEquipped.setText("Armor: " + equippedArmor[0]);
+		}
+		if (e.getSource() == leaveArmorShop) {
+			armorShopPanel.setVisible(false);
+			townPanel.setVisible(true);
+			goldCounter.setText("Gold: " + playerGold);
+		}
+		if (e.getSource() == nextArmor) {
+			if (currArmorDisplayed < armorNames.length - 1) {
+				currArmorDisplayed++;
+				armorDisplayedCounter.setText((currArmorDisplayed + 1) + "/6");
+				armorName.setText(armorNames[currArmorDisplayed]);
+				armorCost.setText(armorPrices[currArmorDisplayed] + " Gold");
+				armorHealth.setText(armorHealths[currArmorDisplayed] + " Extra Health");
+				if (currArmorDisplayed >= armorNames.length - 1) {
+					nextArmor.setBackground(Color.darkGray);
+				}
+				previousArmor.setBackground(Color.green);
+				if (armorsPurchased[currArmorDisplayed]) {
+					equipArmor.setVisible(true);
+					purchaseArmor.setVisible(false);
+					if (currEquippedArmor == currArmorDisplayed) {
+						equipArmor.setText("Equipped");
+					} else {
+						equipArmor.setText("Equip Armor");
+					}
+				} else {
+					purchaseArmor.setVisible(true);
+					equipArmor.setVisible(false);
+				}
+			}
+		}
+		if (e.getSource() == previousArmor) {
+			if (currArmorDisplayed > 0) {
+				currArmorDisplayed--;
+				armorDisplayedCounter.setText((currArmorDisplayed + 1) + "/6");
+				armorName.setText(armorNames[currArmorDisplayed]);
+				armorCost.setText(armorPrices[currArmorDisplayed] + " Gold");
+				armorHealth.setText(armorHealths[currArmorDisplayed] + " Extra Health");
+				if (currArmorDisplayed <= 0) {
+					previousArmor.setBackground(Color.darkGray);
+				}
+				nextArmor.setBackground(Color.green);
+				if (armorsPurchased[currArmorDisplayed]) {
+					equipArmor.setVisible(true);
+					purchaseArmor.setVisible(false);
+					if (currEquippedArmor == currArmorDisplayed) {
+						equipArmor.setText("Equipped");
+					} else {
+						equipArmor.setText("Equip Armor");
+					}
+				} else {
+					purchaseArmor.setVisible(true);
+					equipArmor.setVisible(false);
+				}
+			}
 		}
 		// DungeonEntrance
 		if (e.getSource() == dungeonEntrance) {
 			townPanel.setVisible(false);
-			dungeonPanel.setVisible(true);
-			dungeonOptionsPanel.setVisible(true);
-			rand = generator.nextInt(4);
-			currentEnemy = floor1Enemies[rand];
-			enemyH = floor1Stats[0] + 1;
-			enemyS = generator.nextInt(floor1Stats[1]) + 1;
-			enemySp = generator.nextInt(floor1Stats[2]) + 1;
-			enemyAcc = floor1Stats[3] + 1;
-			currentEnemyName.setText(currentEnemy);
-			currentEnemyHealth.setText("Enemy HP: " + enemyH);
-			playerNameLabel.setText(name);
-			playerHealthLabel.setText("Your HP: " + playerHealth);
-			currentPlayerHealth = playerHealth;
-			specialMoveCounter = 2;
-			roomCounter = 1;
-			currentRoom.setText("Room 1");
-			if (playerSpeed < enemySp) {
-				currentPlayerHealth = currentPlayerHealth - enemyS;
-				JOptionPane.showMessageDialog(this, "The enemy was faster than you and struck first!");
+			floorSelectPanel.setVisible(true);
+		}
+		if (e.getSource() == selectFloor) {
+			if (firstFloor.isSelected()) {
+				floorSelectPanel.setVisible(false);
+				dungeonPanel.setVisible(true);
+				dungeonOptionsPanel.setVisible(true);
+				rand = generator.nextInt(4);
+				currentEnemy = floor1Enemies[rand];
+				enemyH = (floor1Stats[0] + 1) / 2 + generator.nextInt(floor1Stats[0] / 2);
+				enemyS = generator.nextInt(floor1Stats[1]) + 1;
+				enemySp = generator.nextInt(floor1Stats[2]) + 1;
+				enemyAcc = floor1Stats[3] + 1;
+				currentEnemyName.setText(currentEnemy);
+				currentEnemyHealth.setText("Enemy HP: " + enemyH);
+				playerNameLabel.setText(name);
+				playerHealthLabel.setText("Your HP: " + playerHealth);
+				currentPlayerHealth = playerHealth;
+				specialMoveCounter = 2;
+				roomCounter = 1;
+				currentRoom.setText("Room 1");
+				if (playerSpeed < enemySp) {
+					currentPlayerHealth = currentPlayerHealth - enemyS;
+					JOptionPane.showMessageDialog(window, "The enemy was faster than you and struck first!");
+				}
+				currentFloor = 1;
+			} else if (secondFloor.isSelected()) {
+				floorSelectPanel.setVisible(false);
+				dungeonPanel.setVisible(true);
+				dungeonOptionsPanel.setVisible(true);
+				rand = generator.nextInt(4);
+				currentEnemy = floor2Enemies[rand];
+				enemyH = (floor2Stats[0] + 1) / 2 + generator.nextInt(floor2Stats[0] / 2);
+				enemyS = generator.nextInt(floor2Stats[1]) + 1;
+				enemySp = generator.nextInt(floor2Stats[2]) + 1;
+				enemyAcc = floor2Stats[3] + 1;
+				currentEnemyName.setText(currentEnemy);
+				currentEnemyHealth.setText("Enemy HP: " + enemyH);
+				playerNameLabel.setText(name);
+				playerHealthLabel.setText("Your HP: " + playerHealth);
+				currentPlayerHealth = playerHealth;
+				specialMoveCounter = 2;
+				roomCounter = 1;
+				currentRoom.setText("Room 1");
+				if (playerSpeed < enemySp) {
+					currentPlayerHealth = currentPlayerHealth - enemyS;
+					JOptionPane.showMessageDialog(window, "The enemy was faster than you and struck first!");
+				}
+				currentFloor = 2;
+			} else if (thirdFloor.isSelected()) {
+				floorSelectPanel.setVisible(false);
+				dungeonPanel.setVisible(true);
+				dungeonOptionsPanel.setVisible(true);
+				rand = generator.nextInt(4);
+				currentEnemy = floor3Enemies[rand];
+				enemyH = (floor3Stats[0] + 1) / 2 + generator.nextInt(floor3Stats[0] / 2);
+				enemyS = generator.nextInt(floor3Stats[1]) + 1;
+				enemySp = generator.nextInt(floor3Stats[2]) + 1;
+				enemyAcc = floor3Stats[3] + 1;
+				currentEnemyName.setText(currentEnemy);
+				currentEnemyHealth.setText("Enemy HP: " + enemyH);
+				playerNameLabel.setText(name);
+				playerHealthLabel.setText("Your HP: " + playerHealth);
+				currentPlayerHealth = playerHealth;
+				specialMoveCounter = 2;
+				roomCounter = 1;
+				currentRoom.setText("Room 1");
+				if (playerSpeed < enemySp) {
+					currentPlayerHealth = currentPlayerHealth - enemyS;
+					JOptionPane.showMessageDialog(window, "The enemy was faster than you and struck first!");
+				}
+				currentFloor = 3;
+			} else if (fourthFloor.isSelected()) {
+				floorSelectPanel.setVisible(false);
+				dungeonPanel.setVisible(true);
+				dungeonOptionsPanel.setVisible(true);
+				rand = generator.nextInt(4);
+				currentEnemy = floor4Enemies[rand];
+				enemyH = (floor4Stats[0] + 1) / 2 + generator.nextInt(floor4Stats[0] / 2);
+				enemyS = generator.nextInt(floor4Stats[1]) + 1;
+				enemySp = generator.nextInt(floor4Stats[2]) + 1;
+				enemyAcc = floor4Stats[3] + 1;
+				currentEnemyName.setText(currentEnemy);
+				currentEnemyHealth.setText("Enemy HP: " + enemyH);
+				playerNameLabel.setText(name);
+				playerHealthLabel.setText("Your HP: " + playerHealth);
+				currentPlayerHealth = playerHealth;
+				specialMoveCounter = 2;
+				roomCounter = 1;
+				currentRoom.setText("Room 1");
+				if (playerSpeed < enemySp) {
+					currentPlayerHealth = currentPlayerHealth - enemyS;
+					JOptionPane.showMessageDialog(window, "The enemy was faster than you and struck first!");
+				}
+				currentFloor = 4;
+			} else if (fifthFloor.isSelected()) {
+				floorSelectPanel.setVisible(false);
+				dungeonPanel.setVisible(true);
+				dungeonOptionsPanel.setVisible(true);
+				rand = generator.nextInt(4);
+				currentEnemy = floor5Enemies[rand];
+				enemyH = (floor5Stats[0] + 1) / 2 + generator.nextInt(floor5Stats[0] / 2);
+				enemyS = generator.nextInt(floor5Stats[1]) + 1;
+				enemySp = generator.nextInt(floor5Stats[2]) + 1;
+				enemyAcc = floor5Stats[3] + 1;
+				currentEnemyName.setText(currentEnemy);
+				currentEnemyHealth.setText("Enemy HP: " + enemyH);
+				playerNameLabel.setText(name);
+				playerHealthLabel.setText("Your HP: " + playerHealth);
+				currentPlayerHealth = playerHealth;
+				specialMoveCounter = 2;
+				roomCounter = 1;
+				currentRoom.setText("Room 1");
+				if (playerSpeed < enemySp) {
+					currentPlayerHealth = currentPlayerHealth - enemyS;
+					JOptionPane.showMessageDialog(window, "The enemy was faster than you and struck first!");
+				}
+				currentFloor = 5;
+			} else {
+				JOptionPane.showMessageDialog(window, "Please select a floor.");
 			}
+		}
+		if (e.getSource() == leaveFloorSelection) {
+			townPanel.setVisible(true);
+			floorSelectPanel.setVisible(false);
 		}
 
 		// Dungeon Options
 		if (e.getSource() == dungeonLightAttack) {
-			int damageDealt = playerDamage;
+			int randomDamage = generator.nextInt(3);
+			int damageDealt = playerDamage - 2 + randomDamage;
 			int damageTaken = enemyS;
 			boolean enemyHit = false;
 			boolean playerHit = false;
@@ -443,46 +1001,88 @@ public class main extends JFrame implements ActionListener {
 				enemyHit = true;
 			}
 			if (enemyHit && playerHit) {
-				JOptionPane.showMessageDialog(this,
+				JOptionPane.showMessageDialog(window,
 						"You took " + damageTaken + " damage, and dealt " + damageDealt + " damage!");
 			} else if (enemyHit && !playerHit) {
-				JOptionPane.showMessageDialog(this,
-						"You missed your attack and the enemy hit you for " + damageTaken + " damage!");
+				JOptionPane.showMessageDialog(window,
+						"The took " + damageTaken + " damage, and you missed your attack!");
 			} else if (!enemyHit && playerHit) {
-				JOptionPane.showMessageDialog(this,
+				JOptionPane.showMessageDialog(window,
 						"The enemy missed their attack and you dealt " + damageDealt + " damage!");
 			} else {
-				JOptionPane.showMessageDialog(this, "How did both of you dumbasses miss.");
+				JOptionPane.showMessageDialog(window, "How did both of you dumbasses miss.");
 			}
 			if (currentPlayerHealth <= 0) {
 				dungeonPanel.setVisible(false);
 				townPanel.setVisible(true);
-				JOptionPane.showMessageDialog(this,
+				JOptionPane.showMessageDialog(window,
 						"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
-				playerGold = playerGold - playerGold/3;
+				playerGold = playerGold - playerGold / 3;
 				goldCounter.setText("Gold: " + playerGold);
 			}
 			if (enemyH <= 0) {
 				dungeonEnemyDefeatedPanel.setVisible(true);
 				dungeonOptionsPanel.setVisible(false);
 				if (roomCounter >= 10) {
-					JOptionPane.showMessageDialog(this,
-							"You have defeated the boss and completed this floor! You gained 50 gold!");
+					switch (currentFloor) {
+					case 1:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 50 gold!");
+						playerGold += 50;
+						break;
+					case 2:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 175 gold!");
+						playerGold += 150;
+						break;
+					case 3:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 300 gold!");
+						playerGold += 250;
+						break;
+					case 4:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 425 gold!");
+						playerGold += 350;
+						break;
+					case 5:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 550 gold!");
+						playerGold += 500;
+						break;
+					}
 					dungeonEnemyDefeatedPanel.setVisible(false);
 					dungeonOptionsPanel.setVisible(true);
 					dungeonPanel.setVisible(false);
 					townPanel.setVisible(true);
-					playerGold += 50;
 					goldCounter.setText("Gold: " + playerGold);
 				} else {
-					int tempGold = generator.nextInt(10) + 5;
-					JOptionPane.showMessageDialog(this, "You defeated the enemy and gained " + tempGold + " gold!");
+					int tempGold = 0;
+					switch (currentFloor) {
+					case 1:
+						tempGold = generator.nextInt(10) + 5;
+						break;
+					case 2:
+						tempGold = generator.nextInt(20) + 15;
+						break;
+					case 3:
+						tempGold = generator.nextInt(30) + 25;
+						break;
+					case 4:
+						tempGold = generator.nextInt(40) + 35;
+						break;
+					case 5:
+						tempGold = generator.nextInt(50) + 45;
+						break;
+					}
+					JOptionPane.showMessageDialog(window, "You defeated the enemy and gained " + tempGold + " gold!");
 					playerGold += tempGold;
 				}
 			}
 		}
 		if (e.getSource() == dungeonHeavyAttack) {
-			int damageDealt = playerDamage;
+			int randomDamage = generator.nextInt(3);
+			int damageDealt = playerDamage - 2 + randomDamage;
 			int damageTaken = enemyS;
 			boolean enemyHit = false;
 			boolean playerHit = false;
@@ -501,134 +1101,198 @@ public class main extends JFrame implements ActionListener {
 				enemyHit = true;
 			}
 			if (enemyHit && playerHit) {
-				JOptionPane.showMessageDialog(this,
+				JOptionPane.showMessageDialog(window,
 						"You took " + damageTaken + " damage, and dealt " + damageDealt + " damage!");
 			} else if (enemyHit && !playerHit) {
-				JOptionPane.showMessageDialog(this,
-						"You missed your attack and the enemy hit you for " + damageTaken + " damage!");
+				JOptionPane.showMessageDialog(window,
+						"The took " + damageTaken + " damage, and you missed your attack!");
 			} else if (!enemyHit && playerHit) {
-				JOptionPane.showMessageDialog(this,
+				JOptionPane.showMessageDialog(window,
 						"The enemy missed their attack and you dealt " + damageDealt + " damage!");
 			} else {
-				JOptionPane.showMessageDialog(this, "How did both of you dumbasses miss.");
+				JOptionPane.showMessageDialog(window, "How did both of you dumbasses miss.");
 			}
 			if (currentPlayerHealth <= 0) {
 				dungeonPanel.setVisible(false);
 				townPanel.setVisible(true);
-				JOptionPane.showMessageDialog(this,
+				JOptionPane.showMessageDialog(window,
 						"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
-				playerGold = playerGold - playerGold/3;
+				playerGold = playerGold - playerGold / 3;
 				goldCounter.setText("Gold: " + playerGold);
 			}
 			if (enemyH <= 0) {
 				dungeonEnemyDefeatedPanel.setVisible(true);
 				dungeonOptionsPanel.setVisible(false);
 				if (roomCounter >= 10) {
-					JOptionPane.showMessageDialog(this,
-							"You have defeated the boss and completed this floor! You gained 50 gold!");
+					switch (currentFloor) {
+					case 1:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 50 gold!");
+						playerGold += 50;
+						break;
+					case 2:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 175 gold!");
+						playerGold += 150;
+						break;
+					case 3:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 300 gold!");
+						playerGold += 250;
+						break;
+					case 4:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 425 gold!");
+						playerGold += 350;
+						break;
+					case 5:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 550 gold!");
+						playerGold += 500;
+						break;
+					}
 					dungeonEnemyDefeatedPanel.setVisible(false);
 					dungeonOptionsPanel.setVisible(true);
 					dungeonPanel.setVisible(false);
 					townPanel.setVisible(true);
-					playerGold += 50;
 					goldCounter.setText("Gold: " + playerGold);
 				} else {
-					int tempGold = generator.nextInt(10) + 5;
-					JOptionPane.showMessageDialog(this, "You defeated the enemy and gained " + tempGold + " gold!");
+					int tempGold = 0;
+					switch (currentFloor) {
+					case 1:
+						tempGold = generator.nextInt(10) + 5;
+						break;
+					case 2:
+						tempGold = generator.nextInt(20) + 15;
+						break;
+					case 3:
+						tempGold = generator.nextInt(30) + 25;
+						break;
+					case 4:
+						tempGold = generator.nextInt(40) + 35;
+						break;
+					case 5:
+						tempGold = generator.nextInt(50) + 45;
+						break;
+					}
+					JOptionPane.showMessageDialog(window, "You defeated the enemy and gained " + tempGold + " gold!");
 					playerGold += tempGold;
 				}
 			}
 		}
 		if (e.getSource() == dungeonSpecialMove) {
-			int damageDealt = playerDamage;
-			int damageTaken = enemyS;
-			boolean enemyHit = false;
-			boolean playerHit = false;
+			int randomDamage = generator.nextInt(3);
+			int damageDealt = playerDamage - 2 + randomDamage;
 			if (build.equals("warrior")) {
+				if (specialMoveCounter > 0) {
+					if (currentPlayerHealth + playerHealth / 3 > playerHealth) {
+						currentPlayerHealth = playerHealth;
+					} else {
+						currentPlayerHealth = currentPlayerHealth + playerHealth / 3;
+					}
+					playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
+					specialMoveCounter--;
+					JOptionPane.showMessageDialog(window, "You pull back and heal for " + playerHealth / 3
+							+ " health! You have " + specialMoveCounter + " uses left!");
+				} else {
+					JOptionPane.showMessageDialog(window,
+							"You can't do this anymore dummy, you used all your special skills!");
+				}
+			} else if (build.equals("mercenary")) {
 				if (specialMoveCounter > 0) {
 					damageDealt = damageDealt * 2;
 					enemyH = enemyH - damageDealt;
 					currentEnemyHealth.setText("Enemy HP: " + enemyH);
-					playerHit = true;
 					specialMoveCounter--;
-					JOptionPane.showMessageDialog(this, "You double strike the enemy for " + damageDealt + " damage!");
-				} else {
-					JOptionPane.showMessageDialog(this,
-							"You can't do this anymore dummy, you used all your special skills!");
-				}
-				if (generator.nextInt(100) <= enemyAcc && enemyH > 0) {
-					currentPlayerHealth = currentPlayerHealth - damageTaken;
-					playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
-					enemyHit = true;
-				}
-				if (enemyHit && playerHit) {
-					JOptionPane.showMessageDialog(this,
-							"You took " + damageTaken + " damage, and you used your special move! You have "
-									+ specialMoveCounter + " uses left!");
-				} else if (enemyHit && !playerHit) {
-					JOptionPane.showMessageDialog(this,
-							"Your special move failed and the enemy hit you for " + damageTaken + " damage!");
-				} else if (!enemyHit && playerHit) {
-					JOptionPane.showMessageDialog(this,
-							"The enemy missed their attack and you used your special move! You have "
-									+ specialMoveCounter + " uses left!");
-				} else {
-					JOptionPane.showMessageDialog(this, "How did both of you dumbasses miss.");
-				}
-			} else if (build.equals("mercenary")) {
-				if (specialMoveCounter > 0) {
-					enemyH = enemyH - damageDealt;
-					currentEnemyHealth.setText("Enemy HP: " + enemyH);
-					specialMoveCounter--;
-					JOptionPane.showMessageDialog(this, "You dodged the enemies attack and hit them for " + damageDealt
+					JOptionPane.showMessageDialog(window, "You double strike the enemy for " + damageDealt
 							+ " damage! You have " + specialMoveCounter + " uses left!");
 				} else {
-					JOptionPane.showMessageDialog(this,
+					JOptionPane.showMessageDialog(window,
 							"You can't do this anymore dummy, you used all your special skills!");
 				}
 			} else if (build.equals("paladin")) {
 				if (specialMoveCounter > 0) {
-					enemyH = enemyH - playerHealth / 4;
+					enemyH = enemyH - playerHealth / 5;
 					currentEnemyHealth.setText("Enemy HP: " + enemyH);
-					if (currentPlayerHealth + playerHealth / 4 > playerHealth) {
+					if (currentPlayerHealth + playerHealth / 5 > playerHealth) {
 						currentPlayerHealth = playerHealth;
 					} else {
-						currentPlayerHealth = currentPlayerHealth + playerHealth / 4;
+						currentPlayerHealth = currentPlayerHealth + playerHealth / 5;
 					}
 					playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
 					specialMoveCounter--;
-					JOptionPane.showMessageDialog(this,
-							"You stole some of the enemies life force and healed yourself for " + playerHealth / 4
-									+ " HP! The enemy was too drained to attack! You have " + specialMoveCounter
-									+ " uses left!");
+					JOptionPane.showMessageDialog(window,
+							"You stole some of the enemies life force and healed yourself for " + playerHealth / 5
+									+ " HP! You have " + specialMoveCounter + " uses left!");
 				} else {
-					JOptionPane.showMessageDialog(this,
+					JOptionPane.showMessageDialog(window,
 							"You can't do this anymore dummy, you used all your special skills!");
 				}
 			}
 			if (currentPlayerHealth <= 0) {
 				dungeonPanel.setVisible(false);
 				townPanel.setVisible(true);
-				JOptionPane.showMessageDialog(this,
+				JOptionPane.showMessageDialog(window,
 						"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
-				playerGold = playerGold - playerGold/3;
+				playerGold = playerGold - playerGold / 20;
 				goldCounter.setText("Gold: " + playerGold);
 			}
 			if (enemyH <= 0) {
 				dungeonEnemyDefeatedPanel.setVisible(true);
 				dungeonOptionsPanel.setVisible(false);
 				if (roomCounter >= 10) {
-					JOptionPane.showMessageDialog(this,
-							"You have defeated the boss and completed this floor!  You gained 50 gold!");
+					switch (currentFloor) {
+					case 1:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 50 gold!");
+						playerGold += 50;
+						break;
+					case 2:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 175 gold!");
+						playerGold += 150;
+						break;
+					case 3:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 300 gold!");
+						playerGold += 250;
+						break;
+					case 4:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 425 gold!");
+						playerGold += 350;
+						break;
+					case 5:
+						JOptionPane.showMessageDialog(window,
+								"You have defeated the boss and completed this floor!  You gained 550 gold!");
+						playerGold += 500;
+						break;
+					}
 					dungeonEnemyDefeatedPanel.setVisible(false);
 					dungeonOptionsPanel.setVisible(true);
 					dungeonPanel.setVisible(false);
 					townPanel.setVisible(true);
-					playerGold += 50;
 					goldCounter.setText("Gold: " + playerGold);
 				} else {
-					int tempGold = generator.nextInt(10) + 5;
-					JOptionPane.showMessageDialog(this, "You defeated the enemy and gained " + tempGold + " gold!");
+					int tempGold = 0;
+					switch (currentFloor) {
+					case 1:
+						tempGold = generator.nextInt(10) + 5;
+						break;
+					case 2:
+						tempGold = generator.nextInt(20) + 15;
+						break;
+					case 3:
+						tempGold = generator.nextInt(30) + 25;
+						break;
+					case 4:
+						tempGold = generator.nextInt(40) + 35;
+						break;
+					case 5:
+						tempGold = generator.nextInt(50) + 45;
+						break;
+					}
+					JOptionPane.showMessageDialog(window, "You defeated the enemy and gained " + tempGold + " gold!");
 					playerGold += tempGold;
 				}
 			}
@@ -638,17 +1302,19 @@ public class main extends JFrame implements ActionListener {
 			if (rand == 0 || rand == 1) {
 				currentPlayerHealth = currentPlayerHealth - enemyS;
 				playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
-				JOptionPane.showMessageDialog(this, "You were unable to escape and took " + enemyS + " damage!");
+				JOptionPane.showMessageDialog(window, "You were unable to escape and took " + enemyS + " damage!");
 				if (currentPlayerHealth <= 0) {
 					dungeonPanel.setVisible(false);
 					townPanel.setVisible(true);
-					JOptionPane.showMessageDialog(this,
+					JOptionPane.showMessageDialog(window,
 							"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
+					playerGold = playerGold - playerGold / 20;
+					goldCounter.setText("Gold: " + playerGold);
 				}
 			} else {
 				dungeonPanel.setVisible(false);
 				townPanel.setVisible(true);
-				JOptionPane.showMessageDialog(this, "You successfully escaped!");
+				JOptionPane.showMessageDialog(window, "You successfully escaped!");
 				goldCounter.setText("Gold: " + playerGold);
 			}
 		}
@@ -660,38 +1326,106 @@ public class main extends JFrame implements ActionListener {
 			dungeonEnemyDefeatedPanel.setVisible(false);
 			if (roomCounter <= 9) {
 				rand = generator.nextInt(4);
-				currentEnemy = floor1Enemies[rand];
-				enemyH = floor1Stats[0] + 1;
-				enemyS = generator.nextInt(floor1Stats[1]) + 1;
-				enemySp = generator.nextInt(floor1Stats[2]) + 1;
-				enemyAcc = floor1Stats[3] + 1;
+				switch (currentFloor) {
+				case 1:
+					currentEnemy = floor1Enemies[rand];
+					enemyH = (floor1Stats[0] + 1) / 2 + generator.nextInt(floor1Stats[0] / 2);
+					enemyS = generator.nextInt(floor1Stats[1]) + 1;
+					enemySp = generator.nextInt(floor1Stats[2]) + 1;
+					enemyAcc = floor1Stats[3] + 1;
+					break;
+				case 2:
+					currentEnemy = floor2Enemies[rand];
+					enemyH = (floor2Stats[0] + 1) / 2 + generator.nextInt(floor2Stats[0] / 2);
+					enemyS = generator.nextInt(floor2Stats[1]) + 1;
+					enemySp = generator.nextInt(floor2Stats[2]) + 1;
+					enemyAcc = floor2Stats[3] + 1;
+					break;
+				case 3:
+					currentEnemy = floor3Enemies[rand];
+					enemyH = (floor3Stats[0] + 1) / 2 + generator.nextInt(floor3Stats[0] / 2);
+					enemyS = generator.nextInt(floor3Stats[1]) + 1;
+					enemySp = generator.nextInt(floor3Stats[2]) + 1;
+					enemyAcc = floor3Stats[3] + 1;
+					break;
+				case 4:
+					currentEnemy = floor4Enemies[rand];
+					enemyH = (floor4Stats[0] + 1) / 2 + generator.nextInt(floor4Stats[0] / 2);
+					enemyS = generator.nextInt(floor4Stats[1]) + 1;
+					enemySp = generator.nextInt(floor4Stats[2]) + 1;
+					enemyAcc = floor4Stats[3] + 1;
+					break;
+				case 5:
+					currentEnemy = floor5Enemies[rand];
+					enemyH = (floor5Stats[0] + 1) / 2 + generator.nextInt(floor5Stats[0] / 2);
+					enemyS = generator.nextInt(floor5Stats[1]) + 1;
+					enemySp = generator.nextInt(floor5Stats[2]) + 1;
+					enemyAcc = floor5Stats[3] + 1;
+					break;
+				}
 				currentRoom.setText("Room " + roomCounter);
 			} else {
-				boss1.setVisible(true);
-				currentEnemy = "Harold the Gnome";
-				enemyH = 20;
-				enemyS = 3;
-				enemySp = 5;
-				enemyAcc = 88;
+				switch (currentFloor) {
+				case 1:
+					boss1.setVisible(true);
+					currentEnemy = "Harold the Gnome";
+					enemyH = 32;
+					enemyS = 3;
+					enemySp = 5;
+					enemyAcc = 88;
+					break;
+				case 2:
+					boss2.setVisible(true);
+					currentEnemy = "Agrius, King of the Wilds";
+					enemyH = 48;
+					enemyS = 11;
+					enemySp = 7;
+					enemyAcc = 76;
+					break;
+				case 3:
+					boss3.setVisible(true);
+					currentEnemy = "Veneficus, King of Magic";
+					enemyH = 62;
+					enemyS = 14;
+					enemySp = 4;
+					enemyAcc = 82;
+					break;
+				case 4:
+					boss4.setVisible(true);
+					currentEnemy = "Sicarius, King of Shadows";
+					enemyH = 72;
+					enemyS = 22;
+					enemySp = 6;
+					enemyAcc = 84;
+					break;
+				case 5:
+					boss5.setVisible(true);
+					currentEnemy = "Eques, King of Man";
+					enemyH = 84;
+					enemyS = 26;
+					enemySp = 8;
+					enemyAcc = 86;
+					break;
+				}
 				currentRoom.setText("Boss room");
 			}
 			currentEnemyName.setText(currentEnemy);
 			currentEnemyHealth.setText("Enemy HP: " + enemyH);
 			playerNameLabel.setText(name);
 			playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
-			if (specialMoveCounter < 5) {
+			if (specialMoveCounter < 2) {
 				specialMoveCounter++;
 			}
 			if (playerSpeed < enemySp) {
 				currentPlayerHealth = currentPlayerHealth - enemyS;
 				playerHealthLabel.setText("Your HP: " + currentPlayerHealth);
-				JOptionPane.showMessageDialog(this, "The enemy was faster than you and struck first!");
+				JOptionPane.showMessageDialog(window, "The enemy was faster than you and struck first!");
 				if (currentPlayerHealth <= 0) {
 					dungeonPanel.setVisible(false);
 					townPanel.setVisible(true);
-					JOptionPane.showMessageDialog(this,
+					JOptionPane.showMessageDialog(window,
 							"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
-					playerGold = playerGold - playerGold/3;
+					playerGold = playerGold - playerGold / 3;
 					goldCounter.setText("Gold: " + playerGold);
 				}
 			}
@@ -704,9 +1438,21 @@ public class main extends JFrame implements ActionListener {
 			goldCounter.setText("Gold: " + playerGold);
 		}
 
-		// Boss1
+		// Boss Intros
 		if (e.getSource() == continueBoss1) {
 			main.boss1.setVisible(false);
+		}
+		if (e.getSource() == continueBoss2) {
+			main.boss2.setVisible(false);
+		}
+		if (e.getSource() == continueBoss3) {
+			main.boss3.setVisible(false);
+		}
+		if (e.getSource() == continueBoss4) {
+			main.boss4.setVisible(false);
+		}
+		if (e.getSource() == continueBoss5) {
+			main.boss5.setVisible(false);
 		}
 	}
 }
