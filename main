@@ -2,6 +2,12 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.Random;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.FileReader;
 
 public class main extends JFrame implements ActionListener {
 
@@ -9,26 +15,31 @@ public class main extends JFrame implements ActionListener {
 	JFrame window;
 	JPanel mainMenuPanel, characterCreationPanel, classSelectionPanel, enterNamePanel, introductionPanel, townPanel,
 			townSelectPanel, dungeonPanel, dungeonOptionsPanel, dungeonEnemyDefeatedPanel, weaponShopPanel,
-			currentWeaponDisplay, armorShopPanel, currentArmorDisplay, floorSelectPanel, floorSelectButtonsPanel;
-	JButton newGame, continueGame, quitGame, confirmClass, confirmPlayerName, continueIntro, continueIntro2, weaponShop,
-			armorShop, dungeonEntrance, dungeonLightAttack, dungeonHeavyAttack, dungeonSpecialMove, dungeonFlee,
-			dungeonContinue, dungeonLeave, continueBoss1, purchaseWeapon, equipWeapon, leaveWeaponShop, nextWeapon,
-			previousWeapon, purchaseArmor, equipArmor, leaveArmorShop, nextArmor, previousArmor, selectFloor,
-			leaveFloorSelection, continueBoss2, continueBoss3, continueBoss4, continueBoss5;
+			currentWeaponDisplay, armorShopPanel, currentArmorDisplay, floorSelectPanel, floorSelectButtonsPanel,
+			saveSelectPanel, saveSelectButtonsPanel, trainingPanel, accuracyPanel, speedPanel, amuletPanel, amuletDisplay;
+	JButton playGame, quitGame, confirmClass, confirmPlayerName, continueIntro, continueIntro2, weaponShop, armorShop,
+			dungeonEntrance, dungeonLightAttack, dungeonHeavyAttack, dungeonSpecialMove, dungeonFlee, dungeonContinue,
+			dungeonLeave, continueBoss1, purchaseWeapon, equipWeapon, leaveWeaponShop, nextWeapon, previousWeapon,
+			purchaseArmor, equipArmor, leaveArmorShop, nextArmor, previousArmor, selectFloor, leaveFloorSelection,
+			continueBoss2, continueBoss3, continueBoss4, continueBoss5, selectSave, leaveSaveSelection, leaveTown,
+			accuracy1, accuracy2, accuracy3, speed1, speed2, speed3, trainingGrounds, leaveTrainingGrounds, equipAmulet,
+			leaveAmuletShop, amuletShop, nextAmulet, previousAmulet;
 	JLabel title, classSelection, warriorBio, mercenaryBio, paladinBio, enterName, currentEnemyName, currentEnemyHealth,
 			playerHealthLabel, playerNameLabel, goldCounter, currentRoom, weaponName, weaponCost, weaponDamage,
 			weaponDisplayedCounter, armorName, armorCost, armorHealth, armorDisplayedCounter, townWeaponEquipped,
-			townArmorEquipped;
+			townArmorEquipped, accuracy1Cost, accuracy2Cost, accuracy3Cost, speed1Cost, speed2Cost, speed3Cost,
+			displayAccuracy, displaySpeed, amuletName, amuletDescription, amuletDisplayedCounter, townAmuletEquipped;
 	JRadioButton warriorClass, mercenaryClass, paladinClass, firstFloor, secondFloor, thirdFloor, fourthFloor,
-			fifthFloor;
+			fifthFloor, save1, save2, save3, save4, save5;
 	JTextField playerName;
 	private static JDialog intro1, intro2, boss1, boss2, boss3, boss4, boss5;
 	Font titleFont = new Font("Times New Roman", Font.PLAIN, 84);
 	static Font textFont = new Font("Times New Roman", Font.PLAIN, 32);
 	Font shopFont = new Font("Times New Roman", Font.PLAIN, 24);
-	int playerHealth, playerDamage, playerSpeed, playerAccuracy, playerGold, currentPlayerHealth, specialMoveCounter,
-			currentFloor;
-	String name, build;
+	static int playerHealth = -1, playerDamage = -1, playerSpeed = -1, playerAccuracy = -1, playerGold = -1,
+			currentPlayerHealth, specialMoveCounter, currentFloor;
+	static String name = "na", build = "na", selectedSave = "";
+	static boolean beatBoss1 = false, beatBoss2 = false, beatBoss3 = false, beatBoss4 = false, beatBoss5 = false;
 
 	// Floor 1
 	static String[] floor1Enemies = { "Skeleton", "Undead Soldier", "Cursed Tombstone", "Graverobber", "Banshee" };
@@ -51,23 +62,39 @@ public class main extends JFrame implements ActionListener {
 	static int[] floor5Stats = { 60, 20, 9, 86 };
 
 	// Weapon List
-	String[] weaponNames = { "Rock", "Wooden Club", "Pitchfork", "Knuckle Dusters", "Spade", "Pickaxe", "Hatchet",
-			"Scabbard", "Mace", "Sword", "Dagger", "Pike", "Halberd", "Hammer", "Great Sword" };
-	int[] weaponPrices = { 50, 75, 150, 275, 400, 550, 675, 800, 975, 1200, 1500, 1800, 2250, 2750, 3500 };
-	int[] weaponDamages = { 5, 7, 10, 12, 14, 18, 20, 24, 28, 32, 36, 38, 44, 50, 56 };
-	int currWeaponDisplayed = 0, currEquippedWeapon = -1;
-	boolean[] weaponsPurchased = { false, false, false, false, false, false, false, false, false, false, false, false,
-			false, false, false };
-	String[] equippedWeapon = { "None", "0", "0" };
+	String[] weaponNames = { "Rock", "Wooden Club", "Hatchet", "Mace", "Sword", "Halberd", "Great Hammer",
+			"Great Sword" };
+	int[] weaponPrices = { 50, 125, 400, 675, 975, 1200, 1500, 1800 };
+	int[] weaponDamages = { 5, 10, 14, 20, 28, 32, 36, 38 };
+	int currWeaponDisplayed = 0;
+	static boolean[] weaponsPurchased = { false, false, false, false, false, false, false, false };
+	static String[] equippedWeapon = { "None", "0", "0" };
+	static int currEquippedWeapon = -1;
 
 	// Armor List
 	String[] armorNames = { "Leather Armor", "Scale Armor", "Plated Mail Armor", "Chainmail Armor", "Plated Iron Armor",
 			"Plated Steel Armor" };
 	int[] armorPrices = { 150, 300, 500, 800, 1000, 1500 };
 	int[] armorHealths = { 6, 12, 18, 24, 30, 36 };
-	int currArmorDisplayed = 0, currEquippedArmor = -1;
-	boolean[] armorsPurchased = { false, false, false, false, false, false };
-	String[] equippedArmor = { "None", "0", "0" };
+	int currArmorDisplayed = 0;
+	static boolean[] armorsPurchased = { false, false, false, false, false, false };
+	static String[] equippedArmor = { "None", "0", "0" };
+	static int currEquippedArmor = -1;
+	
+	// Amulet List
+	String[] amuletNames = { "???", "???" , "???" , "???" , "???" };
+	int[] amuletModifiers = { 15, 3, 10, 12, 2 };
+	String[] amuletDesc = { "???" , "???" , "???" , "???" , "???" };
+	int currAmuletDisplayed = 0;
+	static boolean[] amuletsUnlocked = { false, false, false, false, false};
+	static String[] equippedAmulet = { "None", "0" };
+	static int currEquippedAmulet = -1;
+	boolean doubleGold = false;
+	
+	// Amulet data storage
+	String[] hiddenAmuletNames = { "Amulet of Precision", "Amulet of Speed" , "Amulet of Defense" , "Amulet of Power" , "Amulet of Wealth"};
+	int[] hiddenAmuletModifiers = { 15, 3, 10, 12, 2 };
+	String[] hiddenAmuletDesc = { "Amulet grants user +15 Accuracy" , "Amulet grants user +3 Speed" , "Amulet grants user +10 Health" , "Amulet grants user +12 Damage" , "Amulet doubles user's gold rewards" };
 
 	// Random Generator
 	Random generator = new Random(System.currentTimeMillis());
@@ -84,18 +111,13 @@ public class main extends JFrame implements ActionListener {
 		mainMenuPanel.setBounds(0, 0, 900, 650);
 		mainMenuPanel.setBackground(Color.black);
 		mainMenuPanel.setLayout(null);
-		newGame = new JButton("New Game");
-		newGame.setBounds(350, 280, 200, 50);
-		newGame.setBackground(Color.gray);
-		newGame.addActionListener(this);
-		mainMenuPanel.add(newGame);
-		continueGame = new JButton("Continue Game");
-		continueGame.setBounds(350, 350, 200, 50);
-		continueGame.setBackground(Color.gray);
-		continueGame.addActionListener(this);
-		mainMenuPanel.add(continueGame);
+		playGame = new JButton("Play Game");
+		playGame.setBounds(350, 280, 200, 50);
+		playGame.setBackground(Color.gray);
+		playGame.addActionListener(this);
+		mainMenuPanel.add(playGame);
 		quitGame = new JButton("Quit Game");
-		quitGame.setBounds(350, 420, 200, 50);
+		quitGame.setBounds(350, 350, 200, 50);
 		quitGame.setBackground(Color.gray);
 		quitGame.addActionListener(this);
 		mainMenuPanel.add(quitGame);
@@ -134,12 +156,14 @@ public class main extends JFrame implements ActionListener {
 		classSelectionPanel.add(warriorClass);
 		classSelectionPanel.add(mercenaryClass);
 		classSelectionPanel.add(paladinClass);
-		warriorBio = new JLabel("Warriors are well rounded fighters with even stats");
+		warriorBio = new JLabel(
+				"Warrior[HP: 18, Damage: 2, Speed: 4, Accuracy: 84] Special Move: Heal for 1/3 of max health.");
 		warriorBio.setBounds(100, 120, 900, 30);
-		mercenaryBio = new JLabel("Mercenarys like to focus more on brute strength "
-				+ "than protecting themselves, so they generally get hurt easier");
+		mercenaryBio = new JLabel(
+				"Mercenary[HP: 14, Damage: 3, Speed: 1, Accuracy: 72] Special Move: Guaranteed Heavy Attack.");
 		mercenaryBio.setBounds(100, 150, 900, 30);
-		paladinBio = new JLabel("Paladins believe that nothing can pierce their iron " + "will, or their iron armor");
+		paladinBio = new JLabel(
+				"Paladin[HP: 22, Damage: 1, Speed: 2, Accuracy: 80] Special Move: Damage enemy and heal for 1/5 of max health.");
 		paladinBio.setBounds(100, 180, 900, 30);
 		classSelectionPanel.add(warriorBio);
 		classSelectionPanel.add(mercenaryBio);
@@ -290,25 +314,175 @@ public class main extends JFrame implements ActionListener {
 		dungeonEntrance.setBounds(50, 240, 200, 50);
 		dungeonEntrance.addActionListener(this);
 		townSelectPanel.add(dungeonEntrance);
+		trainingGrounds = new JButton("Training Grounds");
+		trainingGrounds.setBounds(300, 80, 200, 50);
+		trainingGrounds.addActionListener(this);
+		townSelectPanel.add(trainingGrounds);
+		amuletShop = new JButton("Amulets");
+		amuletShop.setBounds(300, 160, 200, 50);
+		amuletShop.addActionListener(this);
+		townSelectPanel.add(amuletShop);
+		leaveTown = new JButton("Return to Menu");
+		leaveTown.setBounds(550, 240, 200, 50);
+		leaveTown.addActionListener(this);
+		townSelectPanel.add(leaveTown);
 		goldCounter = new JLabel("");
 		goldCounter.setBounds(550, 10, 300, 80);
 		goldCounter.setFont(textFont);
 		goldCounter.setForeground(Color.yellow);
 		goldCounter.setHorizontalAlignment(SwingConstants.RIGHT);
 		townWeaponEquipped = new JLabel("Weapon: Fists");
-		townWeaponEquipped.setBounds(40,10,500,80);
+		townWeaponEquipped.setBounds(40, 10, 500, 80);
 		townWeaponEquipped.setFont(textFont);
 		townWeaponEquipped.setForeground(Color.white);
 		townWeaponEquipped.setHorizontalAlignment(SwingConstants.LEFT);
 		townArmorEquipped = new JLabel("Armor: None");
-		townArmorEquipped.setBounds(40,50,500,80);
+		townArmorEquipped.setBounds(40, 50, 500, 80);
 		townArmorEquipped.setFont(textFont);
 		townArmorEquipped.setForeground(Color.white);
 		townArmorEquipped.setHorizontalAlignment(SwingConstants.LEFT);
+		townAmuletEquipped = new JLabel("Amulet: None");
+		townAmuletEquipped.setBounds(40, 90, 500, 80);
+		townAmuletEquipped.setFont(textFont);
+		townAmuletEquipped.setForeground(Color.white);
+		townAmuletEquipped.setHorizontalAlignment(SwingConstants.LEFT);
 		townPanel.add(townWeaponEquipped);
 		townPanel.add(townArmorEquipped);
+		townPanel.add(townAmuletEquipped);
 		townPanel.add(goldCounter);
 		townPanel.setVisible(false);
+
+		// Training Panel
+		trainingPanel = new JPanel();
+		trainingPanel.setBounds(0, 0, 900, 650);
+		trainingPanel.setBackground(Color.black);
+		trainingPanel.setLayout(null);
+		accuracyPanel = new JPanel();
+		accuracyPanel.setBounds(100, 75, 300, 400);
+		accuracyPanel.setBackground(Color.gray);
+		accuracyPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		accuracyPanel.setLayout(null);
+		trainingPanel.add(accuracyPanel);
+		displayAccuracy = new JLabel("Your Accuracy: ");
+		displayAccuracy.setBounds(50, 20, 200, 50);
+		displayAccuracy.setHorizontalAlignment(SwingConstants.CENTER);
+		displayAccuracy.setFont(shopFont);
+		accuracyPanel.add(displayAccuracy);
+		accuracy1 = new JButton("Accuracy +1");
+		accuracy1.setBounds(50, 95, 200, 50);
+		accuracy1.addActionListener(this);
+		accuracy1Cost = new JLabel("100 Gold");
+		accuracy1Cost.setBounds(50, 135, 200, 50);
+		accuracy1Cost.setHorizontalAlignment(SwingConstants.CENTER);
+		accuracy1Cost.setFont(shopFont);
+		accuracyPanel.add(accuracy1);
+		accuracyPanel.add(accuracy1Cost);
+		accuracy2 = new JButton("Accuracy +2");
+		accuracy2.setBounds(50, 195, 200, 50);
+		accuracy2.addActionListener(this);
+		accuracy2Cost = new JLabel("180 Gold");
+		accuracy2Cost.setBounds(50, 235, 200, 50);
+		accuracy2Cost.setHorizontalAlignment(SwingConstants.CENTER);
+		accuracy2Cost.setFont(shopFont);
+		accuracyPanel.add(accuracy2);
+		accuracyPanel.add(accuracy2Cost);
+		accuracy3 = new JButton("Accuracy +3");
+		accuracy3.setBounds(50, 295, 200, 50);
+		accuracy3.addActionListener(this);
+		accuracy3Cost = new JLabel("240 Gold");
+		accuracy3Cost.setBounds(50, 335, 200, 50);
+		accuracy3Cost.setHorizontalAlignment(SwingConstants.CENTER);
+		accuracy3Cost.setFont(shopFont);
+		accuracyPanel.add(accuracy3);
+		accuracyPanel.add(accuracy3Cost);
+		speedPanel = new JPanel();
+		speedPanel.setBounds(475, 75, 300, 400);
+		speedPanel.setBackground(Color.gray);
+		speedPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		speedPanel.setLayout(null);
+		trainingPanel.add(speedPanel);
+		displaySpeed = new JLabel("Your Speed: ");
+		displaySpeed.setBounds(50, 20, 200, 50);
+		displaySpeed.setHorizontalAlignment(SwingConstants.CENTER);
+		displaySpeed.setFont(shopFont);
+		speedPanel.add(displaySpeed);
+		speed1 = new JButton("Speed +1");
+		speed1.setBounds(50, 95, 200, 50);
+		speed1.addActionListener(this);
+		speed1Cost = new JLabel("175 Gold");
+		speed1Cost.setBounds(50, 135, 200, 50);
+		speed1Cost.setHorizontalAlignment(SwingConstants.CENTER);
+		speed1Cost.setFont(shopFont);
+		speedPanel.add(speed1);
+		speedPanel.add(speed1Cost);
+		speed2 = new JButton("Speed +2");
+		speed2.setBounds(50, 195, 200, 50);
+		speed2.addActionListener(this);
+		speed2Cost = new JLabel("250 Gold");
+		speed2Cost.setBounds(50, 235, 200, 50);
+		speed2Cost.setHorizontalAlignment(SwingConstants.CENTER);
+		speed2Cost.setFont(shopFont);
+		speedPanel.add(speed2);
+		speedPanel.add(speed2Cost);
+		speed3 = new JButton("Speed +3");
+		speed3.setBounds(50, 295, 200, 50);
+		speed3.addActionListener(this);
+		speed3Cost = new JLabel("310 Gold");
+		speed3Cost.setBounds(50, 335, 200, 50);
+		speed3Cost.setHorizontalAlignment(SwingConstants.CENTER);
+		speed3Cost.setFont(shopFont);
+		speedPanel.add(speed3);
+		speedPanel.add(speed3Cost);
+		leaveTrainingGrounds = new JButton("Return to Town");
+		leaveTrainingGrounds.setBounds(363, 500, 150, 40);
+		leaveTrainingGrounds.addActionListener(this);
+		trainingPanel.add(leaveTrainingGrounds);
+		trainingPanel.setVisible(false);
+
+		// Save Select Panel
+		saveSelectPanel = new JPanel();
+		saveSelectPanel.setBounds(0, 0, 900, 650);
+		saveSelectPanel.setBackground(Color.black);
+		saveSelectPanel.setLayout(null);
+		saveSelectButtonsPanel = new JPanel();
+		saveSelectButtonsPanel.setBounds(300, 50, 300, 500);
+		saveSelectButtonsPanel.setBackground(Color.gray);
+		saveSelectButtonsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		saveSelectButtonsPanel.setLayout(null);
+		saveSelectPanel.add(saveSelectButtonsPanel);
+		save1 = new JRadioButton("Empty Save");
+		save1.setBounds(25, 50, 250, 30);
+		save2 = new JRadioButton("Empty Save");
+		save2.setBounds(25, 100, 250, 30);
+		save3 = new JRadioButton("Empty Save");
+		save3.setBounds(25, 150, 250, 30);
+		save4 = new JRadioButton("Empty Save");
+		save4.setBounds(25, 200, 250, 30);
+		save5 = new JRadioButton("Empty Save");
+		save5.setBounds(25, 250, 250, 30);
+		ButtonGroup saveSelection = new ButtonGroup();
+		saveSelection.add(save1);
+		saveSelection.add(save2);
+		saveSelection.add(save3);
+		saveSelection.add(save4);
+		saveSelection.add(save5);
+		selectSave = new JButton("Select Save");
+		selectSave.setBounds(75, 375, 150, 30);
+		selectSave.addActionListener(this);
+		leaveSaveSelection = new JButton("Return to Menu");
+		leaveSaveSelection.setBounds(75, 425, 150, 30);
+		leaveSaveSelection.addActionListener(this);
+		saveSelectButtonsPanel.add(save1);
+		saveSelectButtonsPanel.add(save2);
+		saveSelectButtonsPanel.add(save3);
+		saveSelectButtonsPanel.add(save4);
+		saveSelectButtonsPanel.add(save5);
+		saveSelectButtonsPanel.add(selectSave);
+		saveSelectButtonsPanel.add(leaveSaveSelection);
+		saveSelectPanel.setVisible(false);
 
 		// Floor Select Panel
 		floorSelectPanel = new JPanel();
@@ -383,7 +557,7 @@ public class main extends JFrame implements ActionListener {
 		dungeonFlee.addActionListener(this);
 		dungeonOptionsPanel.add(dungeonFlee);
 		currentEnemyName = new JLabel("");
-		currentEnemyName.setBounds(50, 30, 300, 80);
+		currentEnemyName.setBounds(50, 30, 400, 80);
 		currentEnemyName.setFont(textFont);
 		currentEnemyName.setForeground(Color.white);
 		currentEnemyHealth = new JLabel("");
@@ -544,6 +718,54 @@ public class main extends JFrame implements ActionListener {
 		armorDisplayedCounter.setHorizontalAlignment(SwingConstants.CENTER);
 		currentArmorDisplay.add(armorDisplayedCounter);
 		armorShopPanel.setVisible(false);
+		
+		// Amulet Collection
+		amuletPanel = new JPanel();
+		amuletPanel.setBounds(0,0,900,650);
+		amuletPanel.setBackground(Color.black);
+		amuletPanel.setLayout(null);
+		amuletDisplay = new JPanel();
+		amuletDisplay.setBounds(245,50,400,500);
+		amuletDisplay.setBackground(Color.gray);
+		amuletDisplay.setLayout(null);
+		amuletDisplay.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+		amuletPanel.add(amuletDisplay);
+		amuletName = new JLabel();
+		amuletName.setBounds(50, 30, 300, 50);
+		amuletName.setFont(textFont);
+		amuletName.setForeground(Color.white);
+		amuletName.setHorizontalAlignment(SwingConstants.CENTER);
+		amuletDescription = new JLabel();
+		amuletDescription.setBounds(90, 100, 210, 30);
+		amuletDescription.setForeground(Color.white);
+		amuletDescription.setHorizontalAlignment(SwingConstants.CENTER);
+		amuletDisplay.add(amuletName);
+		amuletDisplay.add(amuletDescription);
+		equipAmulet = new JButton("Equip Amulet");
+		equipAmulet.setBounds(100, 320, 200, 50);
+		equipAmulet.addActionListener(this);
+		equipAmulet.setVisible(false);
+		leaveAmuletShop = new JButton("Return to Town");
+		leaveAmuletShop.setBounds(100, 390, 200, 50);
+		leaveAmuletShop.addActionListener(this);
+		amuletDisplay.add(equipAmulet);
+		amuletDisplay.add(leaveAmuletShop);
+		nextAmulet = new JButton(">");
+		nextAmulet.setBounds(650,250,50,80);
+		nextAmulet.addActionListener(this);
+		nextAmulet.setBackground(Color.green);
+		previousAmulet = new JButton("<");
+		previousAmulet.setBounds(190, 250, 50, 80);
+		previousAmulet.addActionListener(this);
+		previousAmulet.setBackground(Color.darkGray);
+		amuletPanel.add(nextAmulet);
+		amuletPanel.add(previousAmulet);
+		amuletDisplayedCounter = new JLabel();
+		amuletDisplayedCounter.setBounds(150, 10, 100, 30);
+		amuletDisplayedCounter.setHorizontalAlignment(SwingConstants.CENTER);
+		amuletDisplay.add(amuletDisplayedCounter);
+		amuletPanel.setVisible(false);
 
 		// JFrame Settings
 		window = new JFrame("Bozo Legends");
@@ -562,6 +784,238 @@ public class main extends JFrame implements ActionListener {
 		window.add(weaponShopPanel);
 		window.add(armorShopPanel);
 		window.add(floorSelectPanel);
+		window.add(saveSelectPanel);
+		window.add(trainingPanel);
+		window.add(amuletPanel);
+	}
+
+	// Save game
+	private void Save(String file) {
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write(name);
+			bw.newLine();
+			bw.write(build);
+			bw.newLine();
+			bw.write("" + playerHealth);
+			bw.newLine();
+			bw.write("" + playerDamage);
+			bw.newLine();
+			bw.write("" + playerSpeed);
+			bw.newLine();
+			bw.write("" + playerAccuracy);
+			bw.newLine();
+			bw.write("" + playerGold);
+			bw.newLine();
+			bw.write("" + beatBoss1);
+			bw.newLine();
+			bw.write("" + beatBoss2);
+			bw.newLine();
+			bw.write("" + beatBoss3);
+			bw.newLine();
+			bw.write("" + beatBoss4);
+			bw.newLine();
+			bw.write("" + beatBoss5);
+			bw.newLine();
+			bw.write(equippedWeapon[0]);
+			bw.newLine();
+			bw.write(equippedWeapon[1]);
+			bw.newLine();
+			bw.write(equippedWeapon[2]);
+			bw.newLine();
+			bw.write("" + weaponsPurchased[0]);
+			bw.newLine();
+			bw.write("" + weaponsPurchased[1]);
+			bw.newLine();
+			bw.write("" + weaponsPurchased[2]);
+			bw.newLine();
+			bw.write("" + weaponsPurchased[3]);
+			bw.newLine();
+			bw.write("" + weaponsPurchased[4]);
+			bw.newLine();
+			bw.write("" + weaponsPurchased[5]);
+			bw.newLine();
+			bw.write("" + weaponsPurchased[6]);
+			bw.newLine();
+			bw.write("" + weaponsPurchased[7]);
+			bw.newLine();
+			bw.write("" + currEquippedWeapon);
+			bw.newLine();
+			bw.write(equippedArmor[0]);
+			bw.newLine();
+			bw.write(equippedArmor[1]);
+			bw.newLine();
+			bw.write(equippedArmor[2]);
+			bw.newLine();
+			bw.write("" + armorsPurchased[0]);
+			bw.newLine();
+			bw.write("" + armorsPurchased[1]);
+			bw.newLine();
+			bw.write("" + armorsPurchased[2]);
+			bw.newLine();
+			bw.write("" + armorsPurchased[3]);
+			bw.newLine();
+			bw.write("" + armorsPurchased[4]);
+			bw.newLine();
+			bw.write("" + armorsPurchased[5]);
+			bw.newLine();
+			bw.write("" + currEquippedArmor);
+			bw.newLine();
+			bw.write("" + amuletNames[0]);
+			bw.newLine();
+			bw.write("" + amuletNames[1]);
+			bw.newLine();
+			bw.write("" + amuletNames[2]);
+			bw.newLine();
+			bw.write("" + amuletNames[3]);
+			bw.newLine();
+			bw.write("" + amuletNames[4]);
+			bw.newLine();
+			bw.write("" + amuletDesc[0]);
+			bw.newLine();
+			bw.write("" + amuletDesc[1]);
+			bw.newLine();
+			bw.write("" + amuletDesc[2]);
+			bw.newLine();
+			bw.write("" + amuletDesc[3]);
+			bw.newLine();
+			bw.write("" + amuletDesc[4]);
+			bw.newLine();
+			bw.write("" + amuletsUnlocked[0]);
+			bw.newLine();
+			bw.write("" + amuletsUnlocked[1]);
+			bw.newLine();
+			bw.write("" + amuletsUnlocked[2]);
+			bw.newLine();
+			bw.write("" + amuletsUnlocked[3]);
+			bw.newLine();
+			bw.write("" + amuletsUnlocked[4]);
+			bw.newLine();
+			bw.write("" + equippedAmulet[0]);
+			bw.newLine();
+			bw.write("" + equippedAmulet[1]);
+			bw.newLine();
+			bw.write("" + currEquippedAmulet);
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("An error occured.");
+			e.printStackTrace();
+		}
+	}
+
+	// Load game
+	private void Load(String file) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String line = br.readLine();
+			name = line;
+			line = br.readLine();
+			build = line;
+			line = br.readLine();
+			playerHealth = Integer.parseInt(line);
+			line = br.readLine();
+			playerDamage = Integer.parseInt(line);
+			line = br.readLine();
+			playerSpeed = Integer.parseInt(line);
+			line = br.readLine();
+			playerAccuracy = Integer.parseInt(line);
+			line = br.readLine();
+			playerGold = Integer.parseInt(line);
+			line = br.readLine();
+			beatBoss1 = Boolean.parseBoolean(line);
+			line = br.readLine();
+			beatBoss2 = Boolean.parseBoolean(line);
+			line = br.readLine();
+			beatBoss3 = Boolean.parseBoolean(line);
+			line = br.readLine();
+			beatBoss4 = Boolean.parseBoolean(line);
+			line = br.readLine();
+			beatBoss5 = Boolean.parseBoolean(line);
+			line = br.readLine();
+			equippedWeapon[0] = line;
+			line = br.readLine();
+			equippedWeapon[1] = line;
+			line = br.readLine();
+			equippedWeapon[2] = line;
+			line = br.readLine();
+			weaponsPurchased[0] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			weaponsPurchased[1] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			weaponsPurchased[2] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			weaponsPurchased[3] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			weaponsPurchased[4] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			weaponsPurchased[5] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			weaponsPurchased[6] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			weaponsPurchased[7] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			currEquippedWeapon = Integer.parseInt(line);
+			line = br.readLine();
+			equippedArmor[0] = line;
+			line = br.readLine();
+			equippedArmor[1] = line;
+			line = br.readLine();
+			equippedArmor[2] = line;
+			line = br.readLine();
+			armorsPurchased[0] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			armorsPurchased[1] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			armorsPurchased[2] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			armorsPurchased[3] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			armorsPurchased[4] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			armorsPurchased[5] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			currEquippedArmor = Integer.parseInt(line);
+			line = br.readLine();
+			amuletNames[0] = line;
+			line = br.readLine();
+			amuletNames[1] = line;
+			line = br.readLine();
+			amuletNames[2] = line;
+			line = br.readLine();
+			amuletNames[3] = line;
+			line = br.readLine();
+			amuletNames[4] = line;
+			line = br.readLine();
+			amuletDesc[0] = line;
+			line = br.readLine();
+			amuletDesc[1] = line;
+			line = br.readLine();
+			amuletDesc[2] = line;
+			line = br.readLine();
+			amuletDesc[3] = line;
+			line = br.readLine();
+			amuletDesc[4] = line;
+			line = br.readLine();
+			amuletsUnlocked[0] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			amuletsUnlocked[1] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			amuletsUnlocked[2] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			amuletsUnlocked[3] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			amuletsUnlocked[4] = Boolean.parseBoolean(line);
+			line = br.readLine();
+			equippedAmulet[0] = line;
+			line = br.readLine();
+			equippedAmulet[1] = line;
+			line = br.readLine();
+			currEquippedAmulet = Integer.parseInt(line);
+			br.close();
+		} catch (IOException e) {
+			System.out.println("An error occured.");
+			e.printStackTrace();
+		}
 	}
 
 	// Make game happen
@@ -572,15 +1026,170 @@ public class main extends JFrame implements ActionListener {
 	// When button is pressed, do the thing
 	public void actionPerformed(ActionEvent e) {
 		// New Game Button
-		if (e.getSource() == newGame) {
+		if (e.getSource() == playGame) {
 			mainMenuPanel.setVisible(false);
-			characterCreationPanel.setVisible(true);
-			classSelectionPanel.setVisible(true);
+			saveSelectPanel.setVisible(true);
+			if (new File("save1.txt").isFile()) {
+				try {
+					BufferedReader br = new BufferedReader(new FileReader("save1.txt"));
+					String line = br.readLine();
+					String playerSave = line;
+					line = br.readLine();
+					playerSave += " (" + line + ")";
+					save1.setText(playerSave);
+					br.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if (new File("save2.txt").isFile()) {
+				try {
+					BufferedReader br = new BufferedReader(new FileReader("save2.txt"));
+					String line = br.readLine();
+					String playerSave = line;
+					line = br.readLine();
+					playerSave += " (" + line + ")";
+					save2.setText(playerSave);
+					br.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if (new File("save3.txt").isFile()) {
+				try {
+					BufferedReader br = new BufferedReader(new FileReader("save3.txt"));
+					String line = br.readLine();
+					String playerSave = line;
+					line = br.readLine();
+					playerSave += " (" + line + ")";
+					save3.setText(playerSave);
+					br.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if (new File("save4.txt").isFile()) {
+				try {
+					BufferedReader br = new BufferedReader(new FileReader("save4.txt"));
+					String line = br.readLine();
+					String playerSave = line;
+					line = br.readLine();
+					playerSave += " (" + line + ")";
+					save4.setText(playerSave);
+					br.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if (new File("save5.txt").isFile()) {
+				try {
+					BufferedReader br = new BufferedReader(new FileReader("save5.txt"));
+					String line = br.readLine();
+					String playerSave = line;
+					line = br.readLine();
+					playerSave += " (" + line + ")";
+					save5.setText(playerSave);
+					br.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 
-		// Continue Game Button
-		if (e.getSource() == continueGame) {
-
+		// Save Selection
+		if (e.getSource() == selectSave) {
+			if (save1.isSelected()) {
+				if (new File("save1.txt").isFile()) {
+					selectedSave = "save1.txt";
+					Load(selectedSave);
+					goldCounter.setText("Gold: " + playerGold);
+					townWeaponEquipped.setText("Weapon: " + equippedWeapon[0]);
+					townArmorEquipped.setText("Armor: " + equippedArmor[0]);
+					townAmuletEquipped.setText("Amulet: " + equippedAmulet[0]);
+					saveSelectPanel.setVisible(false);
+					townPanel.setVisible(true);
+					townSelectPanel.setVisible(true);
+				} else {
+					saveSelectPanel.setVisible(false);
+					characterCreationPanel.setVisible(true);
+					classSelectionPanel.setVisible(true);
+					selectedSave = "save1.txt";
+				}
+			} else if (save2.isSelected()) {
+				if (new File("save2.txt").isFile()) {
+					selectedSave = "save2.txt";
+					Load(selectedSave);
+					goldCounter.setText("Gold: " + playerGold);
+					townWeaponEquipped.setText("Weapon: " + equippedWeapon[0]);
+					townArmorEquipped.setText("Armor: " + equippedArmor[0]);
+					townAmuletEquipped.setText("Amulet: " + equippedAmulet[0]);
+					saveSelectPanel.setVisible(false);
+					townPanel.setVisible(true);
+					townSelectPanel.setVisible(true);
+				} else {
+					saveSelectPanel.setVisible(false);
+					characterCreationPanel.setVisible(true);
+					classSelectionPanel.setVisible(true);
+					selectedSave = "save2.txt";
+				}
+			} else if (save3.isSelected()) {
+				if (new File("save3.txt").isFile()) {
+					selectedSave = "save3.txt";
+					Load(selectedSave);
+					goldCounter.setText("Gold: " + playerGold);
+					townWeaponEquipped.setText("Weapon: " + equippedWeapon[0]);
+					townArmorEquipped.setText("Armor: " + equippedArmor[0]);
+					townAmuletEquipped.setText("Amulet: " + equippedAmulet[0]);
+					saveSelectPanel.setVisible(false);
+					townPanel.setVisible(true);
+					townSelectPanel.setVisible(true);
+				} else {
+					saveSelectPanel.setVisible(false);
+					characterCreationPanel.setVisible(true);
+					classSelectionPanel.setVisible(true);
+					selectedSave = "save3.txt";
+				}
+			} else if (save4.isSelected()) {
+				if (new File("save4.txt").isFile()) {
+					selectedSave = "save4.txt";
+					Load(selectedSave);
+					goldCounter.setText("Gold: " + playerGold);
+					townWeaponEquipped.setText("Weapon: " + equippedWeapon[0]);
+					townArmorEquipped.setText("Armor: " + equippedArmor[0]);
+					townAmuletEquipped.setText("Amulet: " + equippedAmulet[0]);
+					saveSelectPanel.setVisible(false);
+					townPanel.setVisible(true);
+					townSelectPanel.setVisible(true);
+				} else {
+					saveSelectPanel.setVisible(false);
+					characterCreationPanel.setVisible(true);
+					classSelectionPanel.setVisible(true);
+					selectedSave = "save4.txt";
+				}
+			} else if (save5.isSelected()) {
+				if (new File("save5.txt").isFile()) {
+					selectedSave = "save5.txt";
+					Load(selectedSave);
+					goldCounter.setText("Gold: " + playerGold);
+					townWeaponEquipped.setText("Weapon: " + equippedWeapon[0]);
+					townArmorEquipped.setText("Armor: " + equippedArmor[0]);
+					townAmuletEquipped.setText("Amulet: " + equippedAmulet[0]);
+					saveSelectPanel.setVisible(false);
+					townPanel.setVisible(true);
+					townSelectPanel.setVisible(true);
+				} else {
+					saveSelectPanel.setVisible(false);
+					characterCreationPanel.setVisible(true);
+					classSelectionPanel.setVisible(true);
+					selectedSave = "save5.txt";
+				}
+			} else {
+				JOptionPane.showMessageDialog(window, "Please select a save.");
+			}
+		}
+		if (e.getSource() == leaveSaveSelection) {
+			saveSelectPanel.setVisible(false);
+			mainMenuPanel.setVisible(true);
 		}
 
 		// Quit Game Button
@@ -634,6 +1243,65 @@ public class main extends JFrame implements ActionListener {
 			}
 		}
 
+		// Leave Town
+		if (e.getSource() == leaveTown) {
+			townPanel.setVisible(false);
+			mainMenuPanel.setVisible(true);
+			Save(selectedSave);
+			name = "na";
+			build = "na";
+			playerHealth = -1;
+			playerDamage = -1;
+			playerSpeed = -1;
+			playerAccuracy = -1;
+			playerGold = -1;
+			beatBoss1 = false;
+			beatBoss2 = false;
+			beatBoss3 = false;
+			beatBoss4 = false;
+			beatBoss5 = false;
+			equippedWeapon[0] = "None";
+			equippedWeapon[1] = "0";
+			equippedWeapon[2] = "0";
+			weaponsPurchased[0] = false;
+			weaponsPurchased[1] = false;
+			weaponsPurchased[2] = false;
+			weaponsPurchased[3] = false;
+			weaponsPurchased[4] = false;
+			weaponsPurchased[5] = false;
+			weaponsPurchased[6] = false;
+			weaponsPurchased[7] = false;
+			currEquippedWeapon = -1;
+			equippedArmor[0] = "None";
+			equippedArmor[1] = "0";
+			equippedArmor[2] = "0";
+			armorsPurchased[0] = false;
+			armorsPurchased[1] = false;
+			armorsPurchased[2] = false;
+			armorsPurchased[3] = false;
+			armorsPurchased[4] = false;
+			armorsPurchased[5] = false;
+			currEquippedArmor = -1;
+			amuletNames[0] = "???";
+			amuletNames[1] = "???";
+			amuletNames[2] = "???";
+			amuletNames[3] = "???";
+			amuletNames[4] = "???";
+			amuletDesc[0] = "???";
+			amuletDesc[1] = "???";
+			amuletDesc[2] = "???";
+			amuletDesc[3] = "???";
+			amuletDesc[4] = "???";
+			amuletsUnlocked[0] = false;
+			amuletsUnlocked[1] = false;
+			amuletsUnlocked[2] = false;
+			amuletsUnlocked[3] = false;
+			amuletsUnlocked[4] = false;
+			equippedAmulet[0] = "None";
+			equippedAmulet[1] = "0";
+			currEquippedAmulet = -1;
+		}
+
 		// Continue Intro
 		if (e.getSource() == continueIntro) {
 			main.intro1.setVisible(false);
@@ -646,6 +1314,7 @@ public class main extends JFrame implements ActionListener {
 			townSelectPanel.setVisible(true);
 			playerGold = 50;
 			goldCounter.setText("Gold: " + playerGold);
+			Save(selectedSave);
 		}
 
 		// Town Buttons
@@ -657,7 +1326,7 @@ public class main extends JFrame implements ActionListener {
 			weaponCost.setText(weaponPrices[0] + " Gold");
 			weaponDamage.setText((weaponDamages[0] - 2) + "-" + (weaponDamages[0] + 1) + " Damage");
 			currWeaponDisplayed = 0;
-			weaponDisplayedCounter.setText((currWeaponDisplayed + 1) + "/15");
+			weaponDisplayedCounter.setText((currWeaponDisplayed + 1) + "/8");
 			previousWeapon.setBackground(Color.darkGray);
 			nextWeapon.setBackground(Color.green);
 			if (weaponsPurchased[0]) {
@@ -697,11 +1366,12 @@ public class main extends JFrame implements ActionListener {
 			weaponShopPanel.setVisible(false);
 			townPanel.setVisible(true);
 			goldCounter.setText("Gold: " + playerGold);
+			Save(selectedSave);
 		}
 		if (e.getSource() == nextWeapon) {
 			if (currWeaponDisplayed < weaponNames.length - 1) {
 				currWeaponDisplayed++;
-				weaponDisplayedCounter.setText((currWeaponDisplayed + 1) + "/15");
+				weaponDisplayedCounter.setText((currWeaponDisplayed + 1) + "/8");
 				weaponName.setText(weaponNames[currWeaponDisplayed]);
 				weaponCost.setText(weaponPrices[currWeaponDisplayed] + " Gold");
 				weaponDamage.setText((weaponDamages[currWeaponDisplayed] - 2) + "-"
@@ -727,7 +1397,7 @@ public class main extends JFrame implements ActionListener {
 		if (e.getSource() == previousWeapon) {
 			if (currWeaponDisplayed > 0) {
 				currWeaponDisplayed--;
-				weaponDisplayedCounter.setText((currWeaponDisplayed + 1) + "/15");
+				weaponDisplayedCounter.setText((currWeaponDisplayed + 1) + "/8");
 				weaponName.setText(weaponNames[currWeaponDisplayed]);
 				weaponCost.setText(weaponPrices[currWeaponDisplayed] + " Gold");
 				weaponDamage.setText((weaponDamages[currWeaponDisplayed] - 2) + "-"
@@ -799,6 +1469,7 @@ public class main extends JFrame implements ActionListener {
 			armorShopPanel.setVisible(false);
 			townPanel.setVisible(true);
 			goldCounter.setText("Gold: " + playerGold);
+			Save(selectedSave);
 		}
 		if (e.getSource() == nextArmor) {
 			if (currArmorDisplayed < armorNames.length - 1) {
@@ -979,6 +1650,214 @@ public class main extends JFrame implements ActionListener {
 			townPanel.setVisible(true);
 			floorSelectPanel.setVisible(false);
 		}
+		// Training Grounds
+		if (e.getSource() == trainingGrounds) {
+			townPanel.setVisible(false);
+			trainingPanel.setVisible(true);
+			displayAccuracy.setText("Your Accuracy: " + playerAccuracy);
+			displaySpeed.setText("Your Speed: " + playerSpeed);
+		}
+		if (e.getSource() == accuracy1) {
+			if (playerGold >= 100 && playerAccuracy != 100) {
+				playerGold = playerGold - 100;
+				playerAccuracy++;
+				displayAccuracy.setText("Your Accuracy: " + playerAccuracy);
+			} else if (playerAccuracy == 100) {
+				JOptionPane.showMessageDialog(window, "I LIKE PENNIES! (You can't increase this any more stoopid)");
+			} else {
+				JOptionPane.showMessageDialog(window, "I LIKE PENNIES! (You don't have enough money dummy)");
+			}
+		}
+		if (e.getSource() == accuracy2) {
+			if (playerGold >= 180 && playerAccuracy != 100) {
+				playerGold = playerGold - 180;
+				playerAccuracy++;
+				playerAccuracy++;
+				if (playerAccuracy > 100) {
+					playerAccuracy = 100;
+				}
+				displayAccuracy.setText("Your Accuracy: " + playerAccuracy);
+			} else if (playerAccuracy == 100) {
+				JOptionPane.showMessageDialog(window, "I LIKE PENNIES! (You can't increase this any more stoopid)");
+			} else {
+				JOptionPane.showMessageDialog(window, "I LIKE PENNIES! (You don't have enough money dummy)");
+			}
+		}
+		if (e.getSource() == accuracy3) {
+			if (playerGold >= 240 && playerAccuracy != 100) {
+				playerGold = playerGold - 240;
+				playerAccuracy++;
+				playerAccuracy++;
+				playerAccuracy++;
+				if (playerAccuracy > 100) {
+					playerAccuracy = 100;
+				}
+				displayAccuracy.setText("Your Accuracy: " + playerAccuracy);
+			} else if (playerAccuracy == 100) {
+				JOptionPane.showMessageDialog(window, "I LIKE PENNIES! (You can't increase this any more stoopid)");
+			} else {
+				JOptionPane.showMessageDialog(window, "I LIKE PENNIES! (You don't have enough money dummy)");
+			}
+		}
+		if (e.getSource() == speed1) {
+			if (playerGold >= 175 && playerSpeed != 10) {
+				playerGold = playerGold - 175;
+				playerSpeed++;
+				displaySpeed.setText("Your Speed: " + playerSpeed);
+			} else if (playerSpeed == 10) {
+				JOptionPane.showMessageDialog(window, "I LIKE QUARTERS! (You can't increase this any more stoopid)");
+			} else {
+				JOptionPane.showMessageDialog(window, "I LIKE QUARTERS! (You don't have enough money dummy)");
+			}
+		}
+		if (e.getSource() == speed2) {
+			if (playerGold >= 250 && playerSpeed != 10) {
+				playerGold = playerGold - 250;
+				playerSpeed++;
+				playerSpeed++;
+				if (playerSpeed > 10) {
+					playerSpeed = 10;
+				}
+				displaySpeed.setText("Your Speed: " + playerSpeed);
+			} else if (playerSpeed == 10) {
+				JOptionPane.showMessageDialog(window, "I LIKE QUARTERS! (You can't increase this any more stoopid)");
+			} else {
+				JOptionPane.showMessageDialog(window, "I LIKE QUARTERS! (You don't have enough money dummy)");
+			}
+		}
+		if (e.getSource() == speed3) {
+			if (playerGold >= 310 && playerSpeed != 10) {
+				playerGold = playerGold - 310;
+				playerSpeed++;
+				playerSpeed++;
+				playerSpeed++;
+				if (playerSpeed > 10) {
+					playerSpeed = 10;
+				}
+				displaySpeed.setText("Your Speed: " + playerSpeed);
+			} else if (playerSpeed == 10) {
+				JOptionPane.showMessageDialog(window, "I LIKE QUARTERS! (You can't increase this any more stoopid)");
+			} else {
+				JOptionPane.showMessageDialog(window, "I LIKE QUARTERS! (You don't have enough money dummy)");
+			}
+		}
+		if (e.getSource() == leaveTrainingGrounds) {
+			townPanel.setVisible(true);
+			trainingPanel.setVisible(false);
+			goldCounter.setText("Gold: " + playerGold);
+			Save(selectedSave);
+		}
+		if (e.getSource() == amuletShop) {
+			townPanel.setVisible(false);
+			amuletPanel.setVisible(true);
+			amuletName.setText(amuletNames[0]);
+			amuletDescription.setText(amuletDesc[0]);
+			currAmuletDisplayed = 0;
+			amuletDisplayedCounter.setText((currAmuletDisplayed + 1) + "/5");
+			previousAmulet.setBackground(Color.darkGray);
+			nextAmulet.setBackground(Color.green);
+			if (amuletsUnlocked[0]) {
+				equipAmulet.setVisible(true);
+				if (currAmuletDisplayed == currEquippedAmulet) {
+					equipAmulet.setText("Equipped");
+				} else {
+					equipAmulet.setText("Equip Amulet");
+				}
+			} else {
+				equipAmulet.setVisible(false);
+			}
+		}
+		if (e.getSource() == equipAmulet) {
+			switch(currEquippedAmulet) {
+			case 0:
+				playerAccuracy = playerAccuracy - Integer.parseInt(equippedAmulet[1]);
+				break;
+			case 1:
+				playerSpeed = playerSpeed - Integer.parseInt(equippedAmulet[1]);
+				break;
+			case 2:
+				playerHealth = playerHealth - Integer.parseInt(equippedAmulet[1]);
+				break;
+			case 3:
+				playerDamage = playerDamage - Integer.parseInt(equippedAmulet[1]);
+				break;
+			case 4:
+				doubleGold = false;
+				break;
+			}
+			equippedAmulet[0] = amuletNames[currAmuletDisplayed];
+			equippedAmulet[1] = "" + amuletModifiers[currAmuletDisplayed];
+			equipAmulet.setText("Equipped");
+			currEquippedAmulet = currAmuletDisplayed;
+			switch(currEquippedAmulet) {
+			case 0:
+				playerAccuracy += Integer.parseInt(equippedAmulet[1]);
+				break;
+			case 1:
+				playerSpeed += Integer.parseInt(equippedAmulet[1]);
+				break;
+			case 2:
+				playerHealth += Integer.parseInt(equippedAmulet[1]);
+				break;
+			case 3:
+				playerDamage += Integer.parseInt(equippedAmulet[1]);
+				break;
+			case 4:
+				doubleGold = true;
+				break;
+			}
+			townAmuletEquipped.setText("Amulet: " + equippedAmulet[0]);
+		}
+		if (e.getSource() == nextAmulet) {
+			if (currAmuletDisplayed < amuletNames.length - 1) {
+				currAmuletDisplayed++;
+				amuletDisplayedCounter.setText((currAmuletDisplayed + 1) + "/5");
+				amuletName.setText(amuletNames[currAmuletDisplayed]);
+				amuletDescription.setText(amuletDesc[currAmuletDisplayed]);
+				if (currAmuletDisplayed >= amuletNames.length - 1) {
+					nextAmulet.setBackground(Color.darkGray);
+				}
+				previousAmulet.setBackground(Color.green);
+				if (amuletsUnlocked[currAmuletDisplayed]) {
+					equipAmulet.setVisible(true);
+					if (currEquippedAmulet == currAmuletDisplayed) {
+						equipAmulet.setText("Equipped");
+					} else {
+						equipAmulet.setText("Equip Amulet");
+					}
+				} else {
+					equipAmulet.setVisible(false);
+				}
+			}
+		}
+		if (e.getSource() == previousAmulet) {
+			if (currAmuletDisplayed > 0) {
+				currAmuletDisplayed--;
+				amuletDisplayedCounter.setText((currAmuletDisplayed + 1) + "/5");
+				amuletName.setText(amuletNames[currAmuletDisplayed]);
+				amuletDescription.setText(amuletDesc[currAmuletDisplayed]);
+				if (currAmuletDisplayed <= 0) {
+					previousAmulet.setBackground(Color.darkGray);
+				}
+				nextAmulet.setBackground(Color.green);
+				if (amuletsUnlocked[currAmuletDisplayed]) {
+					equipAmulet.setVisible(true);
+					if (currEquippedAmulet == currAmuletDisplayed) {
+						equipAmulet.setText("Equipped");
+					} else {
+						equipAmulet.setText("Equip Amulet");
+					}
+				} else {
+					equipAmulet.setVisible(false);
+				}
+			}
+		}
+		if (e.getSource() == leaveAmuletShop) {
+			amuletPanel.setVisible(false);
+			townPanel.setVisible(true);
+			goldCounter.setText("Gold: " + playerGold);
+			Save(selectedSave);
+		}
 
 		// Dungeon Options
 		if (e.getSource() == dungeonLightAttack) {
@@ -1017,38 +1896,116 @@ public class main extends JFrame implements ActionListener {
 				townPanel.setVisible(true);
 				JOptionPane.showMessageDialog(window,
 						"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
-				playerGold = playerGold - playerGold / 3;
+				playerGold = playerGold - playerGold / 20;
 				goldCounter.setText("Gold: " + playerGold);
+				Save(selectedSave);
 			}
 			if (enemyH <= 0) {
 				dungeonEnemyDefeatedPanel.setVisible(true);
 				dungeonOptionsPanel.setVisible(false);
 				if (roomCounter >= 10) {
+					int tempGold = 0;
+					int dropAmulet = 0;
 					switch (currentFloor) {
 					case 1:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 50 gold!");
-						playerGold += 50;
+						if (beatBoss1) {
+							tempGold = generator.nextInt(10) + 5;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 50 gold!");
+							playerGold += 50;
+							beatBoss1 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[0] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a small crosshair.");
+							amuletNames[0] = hiddenAmuletNames[0];
+							amuletDesc[0] = hiddenAmuletDesc[0];
+						}
 						break;
 					case 2:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 175 gold!");
-						playerGold += 150;
+						if (beatBoss2) {
+							tempGold = generator.nextInt(20) + 15;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 175 gold!");
+							playerGold += 150;
+							beatBoss2 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[1] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a rabbit.");
+							amuletNames[1] = hiddenAmuletNames[1];
+							amuletDesc[1] = hiddenAmuletDesc[1];
+						}
 						break;
 					case 3:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 300 gold!");
-						playerGold += 250;
+						if (beatBoss3) {
+							tempGold = generator.nextInt(30) + 25;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 300 gold!");
+							playerGold += 250;
+							beatBoss3 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[2] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a shield.");
+							amuletNames[2] = hiddenAmuletNames[2];
+							amuletDesc[2] = hiddenAmuletDesc[2];
+						}
 						break;
 					case 4:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 425 gold!");
-						playerGold += 350;
+						if (beatBoss4) {
+							tempGold = generator.nextInt(40) + 35;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 425 gold!");
+							playerGold += 350;
+							beatBoss4 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[3] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a dagger.");
+							amuletNames[3] = hiddenAmuletNames[3];
+							amuletDesc[3] = hiddenAmuletDesc[3];
+						}
 						break;
 					case 5:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 550 gold!");
-						playerGold += 500;
+						if (beatBoss5) {
+							tempGold = generator.nextInt(50) + 45;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 550 gold!");
+							playerGold += 500;
+							beatBoss5 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[4] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a gold coin.");
+							amuletNames[4] = hiddenAmuletNames[4];
+							amuletDesc[4] = hiddenAmuletDesc[4];
+						}
 						break;
 					}
 					dungeonEnemyDefeatedPanel.setVisible(false);
@@ -1056,6 +2013,7 @@ public class main extends JFrame implements ActionListener {
 					dungeonPanel.setVisible(false);
 					townPanel.setVisible(true);
 					goldCounter.setText("Gold: " + playerGold);
+					Save(selectedSave);
 				} else {
 					int tempGold = 0;
 					switch (currentFloor) {
@@ -1117,38 +2075,116 @@ public class main extends JFrame implements ActionListener {
 				townPanel.setVisible(true);
 				JOptionPane.showMessageDialog(window,
 						"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
-				playerGold = playerGold - playerGold / 3;
+				playerGold = playerGold - playerGold / 20;
 				goldCounter.setText("Gold: " + playerGold);
+				Save(selectedSave);
 			}
 			if (enemyH <= 0) {
 				dungeonEnemyDefeatedPanel.setVisible(true);
 				dungeonOptionsPanel.setVisible(false);
 				if (roomCounter >= 10) {
+					int tempGold = 0;
+					int dropAmulet = 0;
 					switch (currentFloor) {
 					case 1:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 50 gold!");
-						playerGold += 50;
+						if (beatBoss1) {
+							tempGold = generator.nextInt(10) + 5;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 50 gold!");
+							playerGold += 50;
+							beatBoss1 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[0] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a small crosshair.");
+							amuletNames[0] = hiddenAmuletNames[0];
+							amuletDesc[0] = hiddenAmuletDesc[0];
+						}
 						break;
 					case 2:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 175 gold!");
-						playerGold += 150;
+						if (beatBoss2) {
+							tempGold = generator.nextInt(20) + 15;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 175 gold!");
+							playerGold += 150;
+							beatBoss2 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[1] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a rabbit.");
+							amuletNames[1] = hiddenAmuletNames[1];
+							amuletDesc[1] = hiddenAmuletDesc[1];
+						}
 						break;
 					case 3:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 300 gold!");
-						playerGold += 250;
+						if (beatBoss3) {
+							tempGold = generator.nextInt(30) + 25;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 300 gold!");
+							playerGold += 250;
+							beatBoss3 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[2] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a shield.");
+							amuletNames[2] = hiddenAmuletNames[2];
+							amuletDesc[2] = hiddenAmuletDesc[2];
+						}
 						break;
 					case 4:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 425 gold!");
-						playerGold += 350;
+						if (beatBoss4) {
+							tempGold = generator.nextInt(40) + 35;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 425 gold!");
+							playerGold += 350;
+							beatBoss4 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[3] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a dagger.");
+							amuletNames[3] = hiddenAmuletNames[3];
+							amuletDesc[3] = hiddenAmuletDesc[3];
+						}
 						break;
 					case 5:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 550 gold!");
-						playerGold += 500;
+						if (beatBoss5) {
+							tempGold = generator.nextInt(50) + 45;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 550 gold!");
+							playerGold += 500;
+							beatBoss5 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[4] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a gold coin.");
+							amuletNames[4] = hiddenAmuletNames[4];
+							amuletDesc[4] = hiddenAmuletDesc[4];
+						}
 						break;
 					}
 					dungeonEnemyDefeatedPanel.setVisible(false);
@@ -1156,6 +2192,7 @@ public class main extends JFrame implements ActionListener {
 					dungeonPanel.setVisible(false);
 					townPanel.setVisible(true);
 					goldCounter.setText("Gold: " + playerGold);
+					Save(selectedSave);
 				} else {
 					int tempGold = 0;
 					switch (currentFloor) {
@@ -1229,43 +2266,112 @@ public class main extends JFrame implements ActionListener {
 							"You can't do this anymore dummy, you used all your special skills!");
 				}
 			}
-			if (currentPlayerHealth <= 0) {
-				dungeonPanel.setVisible(false);
-				townPanel.setVisible(true);
-				JOptionPane.showMessageDialog(window,
-						"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
-				playerGold = playerGold - playerGold / 20;
-				goldCounter.setText("Gold: " + playerGold);
-			}
 			if (enemyH <= 0) {
 				dungeonEnemyDefeatedPanel.setVisible(true);
 				dungeonOptionsPanel.setVisible(false);
 				if (roomCounter >= 10) {
+					int tempGold = 0;
+					int dropAmulet = 0;
 					switch (currentFloor) {
 					case 1:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 50 gold!");
-						playerGold += 50;
+						if (beatBoss1) {
+							tempGold = generator.nextInt(10) + 5;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 50 gold!");
+							playerGold += 50;
+							beatBoss1 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[0] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a small crosshair.");
+							amuletNames[0] = hiddenAmuletNames[0];
+							amuletDesc[0] = hiddenAmuletDesc[0];
+						}
 						break;
 					case 2:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 175 gold!");
-						playerGold += 150;
+						if (beatBoss2) {
+							tempGold = generator.nextInt(20) + 15;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 175 gold!");
+							playerGold += 150;
+							beatBoss2 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[1] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a rabbit.");
+							amuletNames[1] = hiddenAmuletNames[1];
+							amuletDesc[1] = hiddenAmuletDesc[1];
+						}
 						break;
 					case 3:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 300 gold!");
-						playerGold += 250;
+						if (beatBoss3) {
+							tempGold = generator.nextInt(30) + 25;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 300 gold!");
+							playerGold += 250;
+							beatBoss3 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[2] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a shield.");
+							amuletNames[2] = hiddenAmuletNames[2];
+							amuletDesc[2] = hiddenAmuletDesc[2];
+						}
 						break;
 					case 4:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 425 gold!");
-						playerGold += 350;
+						if (beatBoss4) {
+							tempGold = generator.nextInt(40) + 35;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 425 gold!");
+							playerGold += 350;
+							beatBoss4 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[3] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a dagger.");
+							amuletNames[3] = hiddenAmuletNames[3];
+							amuletDesc[3] = hiddenAmuletDesc[3];
+						}
 						break;
 					case 5:
-						JOptionPane.showMessageDialog(window,
-								"You have defeated the boss and completed this floor!  You gained 550 gold!");
-						playerGold += 500;
+						if (beatBoss5) {
+							tempGold = generator.nextInt(50) + 45;
+							JOptionPane.showMessageDialog(window,
+									"You defeated the enemy and gained " + tempGold + " gold!");
+							playerGold += tempGold;
+						} else {
+							JOptionPane.showMessageDialog(window,
+									"You have defeated the boss and completed this floor!  You gained 550 gold!");
+							playerGold += 500;
+							beatBoss5 = true;
+						}
+						dropAmulet = generator.nextInt(20);
+						if (dropAmulet == 0) {
+							amuletsUnlocked[4] = true;
+							JOptionPane.showMessageDialog(window, "You look to the floor to find a small amulet. Inscribed on it is a gold coin.");
+							amuletNames[4] = hiddenAmuletNames[4];
+							amuletDesc[4] = hiddenAmuletDesc[4];
+						}
 						break;
 					}
 					dungeonEnemyDefeatedPanel.setVisible(false);
@@ -1273,6 +2379,7 @@ public class main extends JFrame implements ActionListener {
 					dungeonPanel.setVisible(false);
 					townPanel.setVisible(true);
 					goldCounter.setText("Gold: " + playerGold);
+					Save(selectedSave);
 				} else {
 					int tempGold = 0;
 					switch (currentFloor) {
@@ -1310,12 +2417,14 @@ public class main extends JFrame implements ActionListener {
 							"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
 					playerGold = playerGold - playerGold / 20;
 					goldCounter.setText("Gold: " + playerGold);
+					Save(selectedSave);
 				}
 			} else {
 				dungeonPanel.setVisible(false);
 				townPanel.setVisible(true);
 				JOptionPane.showMessageDialog(window, "You successfully escaped!");
 				goldCounter.setText("Gold: " + playerGold);
+				Save(selectedSave);
 			}
 		}
 
@@ -1324,8 +2433,8 @@ public class main extends JFrame implements ActionListener {
 			roomCounter++;
 			dungeonOptionsPanel.setVisible(true);
 			dungeonEnemyDefeatedPanel.setVisible(false);
+			rand = generator.nextInt(4);
 			if (roomCounter <= 9) {
-				rand = generator.nextInt(4);
 				switch (currentFloor) {
 				case 1:
 					currentEnemy = floor1Enemies[rand];
@@ -1381,6 +2490,7 @@ public class main extends JFrame implements ActionListener {
 					enemyS = 11;
 					enemySp = 7;
 					enemyAcc = 76;
+					currentRoom.setText("Boss room");
 					break;
 				case 3:
 					boss3.setVisible(true);
@@ -1389,6 +2499,7 @@ public class main extends JFrame implements ActionListener {
 					enemyS = 14;
 					enemySp = 4;
 					enemyAcc = 82;
+					currentRoom.setText("Boss room");
 					break;
 				case 4:
 					boss4.setVisible(true);
@@ -1397,6 +2508,7 @@ public class main extends JFrame implements ActionListener {
 					enemyS = 22;
 					enemySp = 6;
 					enemyAcc = 84;
+					currentRoom.setText("Boss room");
 					break;
 				case 5:
 					boss5.setVisible(true);
@@ -1405,6 +2517,7 @@ public class main extends JFrame implements ActionListener {
 					enemyS = 26;
 					enemySp = 8;
 					enemyAcc = 86;
+					currentRoom.setText("Boss room");
 					break;
 				}
 				currentRoom.setText("Boss room");
@@ -1425,7 +2538,7 @@ public class main extends JFrame implements ActionListener {
 					townPanel.setVisible(true);
 					JOptionPane.showMessageDialog(window,
 							"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
-					playerGold = playerGold - playerGold / 3;
+					playerGold = playerGold - playerGold / 20;
 					goldCounter.setText("Gold: " + playerGold);
 				}
 			}
@@ -1436,6 +2549,7 @@ public class main extends JFrame implements ActionListener {
 			dungeonPanel.setVisible(false);
 			townPanel.setVisible(true);
 			goldCounter.setText("Gold: " + playerGold);
+			Save(selectedSave);
 		}
 
 		// Boss Intros
