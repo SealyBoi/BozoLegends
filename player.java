@@ -8,6 +8,7 @@ public class player{
 	private int speed;
 	private int accuracy;
 	private int gold;
+	private int specialMoveCounter;
 	
 	// Set Player Stats
 	public void setName(String newName) {
@@ -34,6 +35,9 @@ public class player{
 	}
 	public void setGold(int newGold) {
 		gold = newGold;
+	}
+	public void setSMC(int newSMC) {
+		specialMoveCounter = newSMC;
 	}
 	public void restoreHealth() {
 		health = maxHealth;
@@ -63,5 +67,8 @@ public class player{
 	}
 	public int getGold() {
 		return gold;
+	}
+	public int getSMC() {
+		return specialMoveCounter;
 	}
 }

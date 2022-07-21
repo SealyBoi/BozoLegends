@@ -13,10 +13,11 @@ public class listener implements ActionListener{
 	playerActions playerActions = new playerActions();
 	shop shop = new shop();
 	database database = playerData.database;
+	dungeon dungeon = new dungeon();
 
 	// Random Generator
 	Random generator = new Random(System.currentTimeMillis());
-	int rand = 0, roomCounter = 0;
+	int rand = 0;
 	
 	public listener(JButton button) {
 		button.addActionListener(this);
@@ -229,117 +230,37 @@ public class listener implements ActionListener{
 				window.floorSelectPanel.setVisible(false);
 				window.dungeonPanel.setVisible(true);
 				window.dungeonOptionsPanel.setVisible(true);
-				rand = generator.nextInt(4);
-				enemy.setName(database.floor1Enemies[rand]);
-				enemy.setHealth((database.floor1Stats[0] + 1) / 2 + generator.nextInt(database.floor1Stats[0] / 2));
-				enemy.setDamage(generator.nextInt(database.floor1Stats[1] + 1));
-				enemy.setSpeed(generator.nextInt(database.floor1Stats[2] + 1));
-				enemy.setAccuracy(database.floor1Stats[3] + 1);
-				window.currentEnemyName.setText(enemy.getName());
-				window.currentEnemyHealth.setText("Enemy HP: " + enemy.getHealth());
-				window.playerNameLabel.setText(player.getName());
-				window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-				database.specialMoveCounter = 2;
-				roomCounter = 1;
-				window.currentRoom.setText("Room 1");
-				if (player.getSpeed() < enemy.getSpeed()) {
-					player.setHealth(player.getHealth() - enemy.getDamage());
-					window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-					JOptionPane.showMessageDialog(window.window, "The enemy was faster than you and struck first!");
-				}
-				database.currentFloor = 1;
+				dungeon.createRoom(database.getFloor1E(), database.getFloor1S(), true);
+				database.setRoom(1);
+				database.setFloor(1);
 			} else if (window.secondFloor.isSelected()) {
 				window.floorSelectPanel.setVisible(false);
 				window.dungeonPanel.setVisible(true);
 				window.dungeonOptionsPanel.setVisible(true);
-				rand = generator.nextInt(4);
-				enemy.setName(database.floor2Enemies[rand]);
-				enemy.setHealth((database.floor2Stats[0] + 1) / 2 + generator.nextInt(database.floor2Stats[0] / 2));
-				enemy.setDamage(generator.nextInt(database.floor2Stats[1] + 1));
-				enemy.setSpeed(generator.nextInt(database.floor2Stats[2] + 1));
-				enemy.setAccuracy(database.floor2Stats[3] + 1);
-				window.currentEnemyName.setText(enemy.getName());
-				window.currentEnemyHealth.setText("Enemy HP: " + enemy.getHealth());
-				window.playerNameLabel.setText(player.getName());
-				window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-				database.specialMoveCounter = 2;
-				roomCounter = 1;
-				window.currentRoom.setText("Room 1");
-				if (player.getSpeed() < enemy.getSpeed()) {
-					player.setHealth(player.getHealth() - enemy.getDamage());
-					window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-					JOptionPane.showMessageDialog(window.window, "The enemy was faster than you and struck first!");
-				}
-				database.currentFloor = 2;
+				dungeon.createRoom(database.getFloor2E(), database.getFloor2S(), true);
+				database.setRoom(1);;
+				database.setFloor(2);
 			} else if (window.thirdFloor.isSelected()) {
 				window.floorSelectPanel.setVisible(false);
 				window.dungeonPanel.setVisible(true);
 				window.dungeonOptionsPanel.setVisible(true);
-				rand = generator.nextInt(4);
-				enemy.setName(database.floor3Enemies[rand]);
-				enemy.setHealth((database.floor3Stats[0] + 1) / 2 + generator.nextInt(database.floor3Stats[0] / 2));
-				enemy.setDamage(generator.nextInt(database.floor3Stats[1] + 1));
-				enemy.setSpeed(generator.nextInt(database.floor3Stats[2] + 1));
-				enemy.setAccuracy(database.floor3Stats[3] + 1);
-				window.currentEnemyName.setText(enemy.getName());
-				window.currentEnemyHealth.setText("Enemy HP: " + enemy.getHealth());
-				window.playerNameLabel.setText(player.getName());
-				window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-				database.specialMoveCounter = 2;
-				roomCounter = 1;
-				window.currentRoom.setText("Room 1");
-				if (player.getSpeed() < enemy.getSpeed()) {
-					player.setHealth(player.getHealth() - enemy.getDamage());
-					window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-					JOptionPane.showMessageDialog(window.window, "The enemy was faster than you and struck first!");
-				}
-				database.currentFloor = 3;
+				dungeon.createRoom(database.getFloor3E(), database.getFloor3S(), true);
+				database.setRoom(1);
+				database.setFloor(3);
 			} else if (window.fourthFloor.isSelected()) {
 				window.floorSelectPanel.setVisible(false);
 				window.dungeonPanel.setVisible(true);
 				window.dungeonOptionsPanel.setVisible(true);
-				rand = generator.nextInt(4);
-				enemy.setName(database.floor4Enemies[rand]);
-				enemy.setHealth((database.floor4Stats[0] + 1) / 2 + generator.nextInt(database.floor4Stats[0] / 2));
-				enemy.setDamage(generator.nextInt(database.floor4Stats[1] + 1));
-				enemy.setSpeed(generator.nextInt(database.floor4Stats[2] + 1));
-				enemy.setAccuracy(database.floor4Stats[3] + 1);
-				window.currentEnemyName.setText(enemy.getName());
-				window.currentEnemyHealth.setText("Enemy HP: " + enemy.getHealth());
-				window.playerNameLabel.setText(player.getName());
-				window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-				database.specialMoveCounter = 2;
-				roomCounter = 1;
-				window.currentRoom.setText("Room 1");
-				if (player.getSpeed() < enemy.getSpeed()) {
-					player.setHealth(player.getHealth() - enemy.getDamage());
-					window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-					JOptionPane.showMessageDialog(window.window, "The enemy was faster than you and struck first!");
-				}
-				database.currentFloor = 4;
+				dungeon.createRoom(database.getFloor4E(), database.getFloor4S(), true);
+				database.setRoom(1);
+				database.setFloor(4);
 			} else if (window.fifthFloor.isSelected()) {
 				window.floorSelectPanel.setVisible(false);
 				window.dungeonPanel.setVisible(true);
 				window.dungeonOptionsPanel.setVisible(true);
-				rand = generator.nextInt(4);
-				enemy.setName(database.floor5Enemies[rand]);
-				enemy.setHealth((database.floor5Stats[0] + 1) / 2 + generator.nextInt(database.floor5Stats[0] / 2));
-				enemy.setDamage(generator.nextInt(database.floor5Stats[1] + 1));
-				enemy.setSpeed(generator.nextInt(database.floor5Stats[2] + 1));
-				enemy.setAccuracy(database.floor5Stats[3] + 1);
-				window.currentEnemyName.setText(enemy.getName());
-				window.currentEnemyHealth.setText("Enemy HP: " + enemy.getHealth());
-				window.playerNameLabel.setText(enemy.getName());
-				window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-				database.specialMoveCounter = 2;
-				roomCounter = 1;
-				window.currentRoom.setText("Room 1");
-				if (player.getSpeed() < enemy.getSpeed()) {
-					player.setHealth(player.getHealth() - enemy.getDamage());
-					window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-					JOptionPane.showMessageDialog(window.window, "The enemy was faster than you and struck first!");
-				}
-				database.currentFloor = 5;
+				dungeon.createRoom(database.getFloor5E(), database.getFloor5S(), true);
+				database.setRoom(1);
+				database.setFloor(5);
 			} else {
 				JOptionPane.showMessageDialog(window.window, "Please select a floor.");
 			}
@@ -589,12 +510,12 @@ public class listener implements ActionListener{
 			if (enemy.getHealth() <= 0) {
 				window.dungeonEnemyDefeatedPanel.setVisible(true);
 				window.dungeonOptionsPanel.setVisible(false);
-				if (roomCounter >= 10) {
+				if (database.getRoom() >= 10) {
 					int tempGold = 0;
 					int dropAmulet = 0;
-					switch (database.currentFloor) {
+					switch (database.getFloor()) {
 					case 1:
-						if (database.beatBoss1) {
+						if (database.getBoss1()) {
 							tempGold = generator.nextInt(10) + 5;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -603,7 +524,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 50 gold!");
 							player.setGold(player.getGold() + 50);
-							database.beatBoss1 = true;
+							database.setBoss1(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -615,7 +536,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 2:
-						if (database.beatBoss2) {
+						if (database.getBoss2()) {
 							tempGold = generator.nextInt(20) + 15;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -624,7 +545,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 175 gold!");
 							player.setGold(player.getGold() + 150);
-							database.beatBoss2 = true;
+							database.setBoss2(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -636,7 +557,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 3:
-						if (database.beatBoss3) {
+						if (database.getBoss3()) {
 							tempGold = generator.nextInt(30) + 25;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -645,7 +566,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 300 gold!");
 							player.setGold(player.getGold() + 250);
-							database.beatBoss3 = true;
+							database.setBoss3(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -657,7 +578,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 4:
-						if (database.beatBoss4) {
+						if (database.getBoss4()) {
 							tempGold = generator.nextInt(40) + 35;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -666,7 +587,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 425 gold!");
 							player.setGold(player.getGold() + 350);
-							database.beatBoss4 = true;
+							database.setBoss4(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -678,7 +599,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 5:
-						if (database.beatBoss5) {
+						if (database.getBoss5()) {
 							tempGold = generator.nextInt(50) + 45;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -687,7 +608,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 550 gold!");
 							player.setGold(player.getGold() + 500);
-							database.beatBoss5 = true;
+							database.setBoss5(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -707,7 +628,7 @@ public class listener implements ActionListener{
 					playerData.Save(database.getSave());
 				} else {
 					int tempGold = 0;
-					switch (database.currentFloor) {
+					switch (database.getFloor()) {
 					case 1:
 						tempGold = generator.nextInt(10) + 5;
 						break;
@@ -761,12 +682,12 @@ public class listener implements ActionListener{
 			if (enemy.getHealth() <= 0) {
 				window.dungeonEnemyDefeatedPanel.setVisible(true);
 				window.dungeonOptionsPanel.setVisible(false);
-				if (roomCounter >= 10) {
+				if (database.getRoom() >= 10) {
 					int tempGold = 0;
 					int dropAmulet = 0;
-					switch (database.currentFloor) {
+					switch (database.getFloor()) {
 					case 1:
-						if (database.beatBoss1) {
+						if (database.getBoss1()) {
 							tempGold = generator.nextInt(10) + 5;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -775,7 +696,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 50 gold!");
 							player.setGold(player.getGold() + 50);
-							database.beatBoss1 = true;
+							database.setBoss1(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -787,7 +708,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 2:
-						if (database.beatBoss2) {
+						if (database.getBoss2()) {
 							tempGold = generator.nextInt(20) + 15;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -796,7 +717,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 175 gold!");
 							player.setGold(player.getGold() + 150);
-							database.beatBoss2 = true;
+							database.setBoss2(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -808,7 +729,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 3:
-						if (database.beatBoss3) {
+						if (database.getBoss3()) {
 							tempGold = generator.nextInt(30) + 25;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -817,7 +738,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 300 gold!");
 							player.setGold(player.getGold() + 250);
-							database.beatBoss3 = true;
+							database.setBoss3(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -829,7 +750,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 4:
-						if (database.beatBoss4) {
+						if (database.getBoss4()) {
 							tempGold = generator.nextInt(40) + 35;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -838,7 +759,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 425 gold!");
 							player.setGold(player.getGold() + 350);
-							database.beatBoss4 = true;
+							database.setBoss4(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -850,7 +771,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 5:
-						if (database.beatBoss5) {
+						if (database.getBoss5()) {
 							tempGold = generator.nextInt(50) + 45;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -859,7 +780,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 550 gold!");
 							player.setGold(player.getGold() + 500);
-							database.beatBoss5 = true;
+							database.setBoss5(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -879,7 +800,7 @@ public class listener implements ActionListener{
 					playerData.Save(database.getSave());
 				} else {
 					int tempGold = 0;
-					switch (database.currentFloor) {
+					switch (database.getFloor()) {
 					case 1:
 						tempGold = generator.nextInt(10) + 5;
 						break;
@@ -903,23 +824,23 @@ public class listener implements ActionListener{
 			}
 		}
 		if (e.getSource() == window.dungeonSpecialMove) {
-			if (database.specialMoveCounter > 0) {
+			if (player.getSMC() > 0) {
 				int[] result = playerActions.specialAttack(window.currentEnemyHealth, window.playerHealthLabel);
-				database.specialMoveCounter--;
+				player.setSMC(player.getSMC() - 1);
 				switch (result[0]) {
 				case 0:
 					JOptionPane.showMessageDialog(window.window,
 							"You pull back and heal for " + player.getMaxHealth() / 3 + " health! You have "
-									+ database.specialMoveCounter + " uses left!");
+									+ player.getSMC() + " uses left!");
 					break;
 				case 1:
 					JOptionPane.showMessageDialog(window.window, "You double strike the enemy for " + result[1]
-							+ " damage! You have " + database.specialMoveCounter + " uses left!");
+							+ " damage! You have " + player.getSMC() + " uses left!");
 					break;
 				case 2:
 					JOptionPane.showMessageDialog(window.window,
 							"You stole some of the enemies life force and healed yourself for "
-									+ player.getMaxHealth() / 5 + " HP! You have " + database.specialMoveCounter
+									+ player.getMaxHealth() / 5 + " HP! You have " + player.getSMC()
 									+ " uses left!");
 					break;
 				}
@@ -930,12 +851,12 @@ public class listener implements ActionListener{
 			if (enemy.getHealth() <= 0) {
 				window.dungeonEnemyDefeatedPanel.setVisible(true);
 				window.dungeonOptionsPanel.setVisible(false);
-				if (roomCounter >= 10) {
+				if (database.getRoom() >= 10) {
 					int tempGold = 0;
 					int dropAmulet = 0;
-					switch (database.currentFloor) {
+					switch (database.getFloor()) {
 					case 1:
-						if (database.beatBoss1) {
+						if (database.getBoss1()) {
 							tempGold = generator.nextInt(10) + 5;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -944,7 +865,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 50 gold!");
 							player.setGold(player.getGold() + 50);
-							database.beatBoss1 = true;
+							database.setBoss1(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -956,7 +877,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 2:
-						if (database.beatBoss2) {
+						if (database.getBoss2()) {
 							tempGold = generator.nextInt(20) + 15;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -965,7 +886,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 175 gold!");
 							player.setGold(player.getGold() + 150);
-							database.beatBoss2 = true;
+							database.setBoss2(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -977,7 +898,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 3:
-						if (database.beatBoss3) {
+						if (database.getBoss3()) {
 							tempGold = generator.nextInt(30) + 25;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -986,7 +907,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 300 gold!");
 							player.setGold(player.getGold() + 250);
-							database.beatBoss3 = true;
+							database.setBoss3(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -998,7 +919,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 4:
-						if (database.beatBoss4) {
+						if (database.getBoss4()) {
 							tempGold = generator.nextInt(40) + 35;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -1007,7 +928,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 425 gold!");
 							player.setGold(player.getGold() + 350);
-							database.beatBoss4 = true;
+							database.setBoss4(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -1019,7 +940,7 @@ public class listener implements ActionListener{
 						}
 						break;
 					case 5:
-						if (database.beatBoss5) {
+						if (database.getBoss5()) {
 							tempGold = generator.nextInt(50) + 45;
 							JOptionPane.showMessageDialog(window.window,
 									"You defeated the enemy and gained " + tempGold + " gold!");
@@ -1028,7 +949,7 @@ public class listener implements ActionListener{
 							JOptionPane.showMessageDialog(window.window,
 									"You have defeated the boss and completed this floor!  You gained 550 gold!");
 							player.setGold(player.getGold() + 500);
-							database.beatBoss5 = true;
+							database.setBoss5(true);
 						}
 						dropAmulet = generator.nextInt(20);
 						if (dropAmulet == 0) {
@@ -1048,7 +969,7 @@ public class listener implements ActionListener{
 					playerData.Save(database.getSave());
 				} else {
 					int tempGold = 0;
-					switch (database.currentFloor) {
+					switch (database.getFloor()) {
 					case 1:
 						tempGold = generator.nextInt(10) + 5;
 						break;
@@ -1092,6 +1013,7 @@ public class listener implements ActionListener{
 				window.townPanel.setVisible(true);
 				JOptionPane.showMessageDialog(window.window, "You successfully escaped!");
 				window.goldCounter.setText("Gold: " + player.getGold());
+				player.restoreHealth();
 				playerData.Save(database.getSave());
 				break;
 			}
@@ -1099,112 +1021,50 @@ public class listener implements ActionListener{
 
 		// Enemy Defeated Options
 		if (e.getSource() == window.dungeonContinue) {
-			roomCounter++;
+			database.setRoom(database.getRoom() + 1);
 			window.dungeonOptionsPanel.setVisible(true);
 			window.dungeonEnemyDefeatedPanel.setVisible(false);
-			rand = generator.nextInt(4);
-			if (roomCounter <= 9) {
-				switch (database.currentFloor) {
+			if (database.getRoom() <= 9) {
+				switch (database.getFloor()) {
 				case 1:
-					enemy.setName(database.floor1Enemies[rand]);
-					enemy.setHealth((database.floor1Stats[0] + 1) / 2 + generator.nextInt(database.floor1Stats[0] / 2));
-					enemy.setDamage(generator.nextInt(database.floor1Stats[1]) + 1);
-					enemy.setSpeed(generator.nextInt(database.floor1Stats[2]) + 1);
-					enemy.setAccuracy(database.floor1Stats[3] + 1);
+					dungeon.createRoom(database.getFloor1E(), database.getFloor1S(), false);
 					break;
 				case 2:
-					enemy.setName(database.floor2Enemies[rand]);
-					enemy.setHealth((database.floor2Stats[0] + 1) / 2 + generator.nextInt(database.floor2Stats[0] / 2));
-					enemy.setDamage(generator.nextInt(database.floor2Stats[1]) + 1);
-					enemy.setSpeed(generator.nextInt(database.floor2Stats[2]) + 1);
-					enemy.setAccuracy(database.floor2Stats[3] + 1);
+					dungeon.createRoom(database.getFloor2E(), database.getFloor2S(), false);
 					break;
 				case 3:
-					enemy.setName(database.floor3Enemies[rand]);
-					enemy.setHealth((database.floor3Stats[0] + 1) / 2 + generator.nextInt(database.floor3Stats[0] / 2));
-					enemy.setDamage(generator.nextInt(database.floor3Stats[1]) + 1);
-					enemy.setSpeed(generator.nextInt(database.floor3Stats[2]) + 1);
-					enemy.setAccuracy(database.floor3Stats[3] + 1);
+					dungeon.createRoom(database.getFloor3E(), database.getFloor3S(), false);
 					break;
 				case 4:
-					enemy.setName(database.floor4Enemies[rand]);
-					enemy.setHealth((database.floor4Stats[0] + 1) / 2 + generator.nextInt(database.floor4Stats[0] / 2));
-					enemy.setDamage(generator.nextInt(database.floor4Stats[1]) + 1);
-					enemy.setSpeed(generator.nextInt(database.floor4Stats[2]) + 1);
-					enemy.setAccuracy(database.floor4Stats[3] + 1);
+					dungeon.createRoom(database.getFloor4E(), database.getFloor4S(), false);
 					break;
 				case 5:
-					enemy.setName(database.floor5Enemies[rand]);
-					enemy.setHealth((database.floor5Stats[0] + 1) / 2 + generator.nextInt(database.floor5Stats[0] / 2));
-					enemy.setDamage(generator.nextInt(database.floor5Stats[1]) + 1);
-					enemy.setSpeed(generator.nextInt(database.floor5Stats[2]) + 1);
-					enemy.setAccuracy(database.floor5Stats[3] + 1);
+					dungeon.createRoom(database.getFloor5E(), database.getFloor5S(), false);
 					break;
 				}
-				window.currentRoom.setText("Room " + roomCounter);
+				window.currentRoom.setText("Room " + database.getRoom());
 			} else {
-				switch (database.currentFloor) {
+				switch (database.getFloor()) {
 				case 1:
+					dungeon.createBoss("Harold the Gnome", 32, 3, 5, 88);
 					window.displayDialog("boss1");
-					enemy.setName("Harold the Gnome");
-					enemy.setHealth(32);
-					enemy.setDamage(3);
-					enemy.setSpeed(5);
-					enemy.setAccuracy(88);
 					break;
 				case 2:
+					dungeon.createBoss("Agrius, King of the Wilds", 48, 11, 7, 76);
 					window.displayDialog("boss2");
-					enemy.setName("Agrius, King of the Wilds");
-					enemy.setHealth(48);
-					enemy.setDamage(11);
-					enemy.setSpeed(7);
-					enemy.setAccuracy(76);
 					break;
 				case 3:
+					dungeon.createBoss("Veneficus, King of Magic", 62, 14, 4, 82);
 					window.displayDialog("boss3");
-					enemy.setName("Veneficus, King of Magic");
-					enemy.setHealth(62);
-					enemy.setDamage(14);
-					enemy.setSpeed(4);
-					enemy.setAccuracy(82);
 					break;
 				case 4:
+					dungeon.createBoss("Sicarius, King of Shadows", 72, 22, 6, 84);
 					window.displayDialog("boss4");
-					enemy.setName("Sicarius, King of Shadows");
-					enemy.setHealth(72);
-					enemy.setDamage(22);
-					enemy.setSpeed(6);
-					enemy.setAccuracy(84);
 					break;
 				case 5:
+					dungeon.createBoss("Eques, King of Man", 84, 26, 8, 86);
 					window.displayDialog("boss5");
-					enemy.setName("Eques, King of Man");
-					enemy.setHealth(84);
-					enemy.setDamage(26);
-					enemy.setSpeed(8);
-					enemy.setAccuracy(86);
 					break;
-				}
-				window.currentRoom.setText("Boss room");
-			}
-			window.currentEnemyName.setText(enemy.getName());
-			window.currentEnemyHealth.setText("Enemy HP: " + enemy.getHealth());
-			window.playerNameLabel.setText(player.getName());
-			window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-			if (database.specialMoveCounter < 2) {
-				database.specialMoveCounter++;
-			}
-			if (player.getSpeed() < enemy.getSpeed()) {
-				player.setHealth(player.getHealth() - enemy.getDamage());
-				window.playerHealthLabel.setText("Your HP: " + player.getHealth());
-				JOptionPane.showMessageDialog(window.window, "The enemy was faster than you and struck first!");
-				if (player.getHealth() <= 0) {
-					window.dungeonPanel.setVisible(false);
-					window.townPanel.setVisible(true);
-					JOptionPane.showMessageDialog(window.window,
-							"You passed out from all of your injuries and were brought back to town! The doctor took some of your gold as expenses!");
-					player.setGold(player.getGold() - player.getGold() / 20);
-					window.goldCounter.setText("Gold: " + player.getGold());
 				}
 			}
 		}

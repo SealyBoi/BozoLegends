@@ -1,32 +1,32 @@
 
 public class database {
-	int specialMoveCounter, currentFloor;
 	private String selectedSave = "none";
-	boolean beatBoss1 = false;
-	boolean beatBoss2 = false;
-	boolean beatBoss3 = false;
-	boolean beatBoss4 = false;
-	boolean beatBoss5 = false;
+	private boolean beatBoss1 = false;
+	private boolean beatBoss2 = false;
+	private boolean beatBoss3 = false;
+	private boolean beatBoss4 = false;
+	private boolean beatBoss5 = false;
+	private int currentFloor, roomCounter;
 
 	// Floor 1
-	String[] floor1Enemies = { "Skeleton", "Undead Soldier", "Cursed Tombstone", "Graverobber", "Banshee" };
-	int[] floor1Stats = { 23, 4, 2, 67 };
+	private String[] floor1Enemies = { "Skeleton", "Undead Soldier", "Cursed Tombstone", "Graverobber", "Banshee" };
+	private int[] floor1Stats = { 23, 4, 2, 67 };
 
 	// Floor 2
-	String[] floor2Enemies = { "Wolf", "Bear", "Deer", "Cougar", "Eagle" };
-	int[] floor2Stats = { 36, 9, 3, 70 };
+	private String[] floor2Enemies = { "Wolf", "Bear", "Deer", "Cougar", "Eagle" };
+	private int[] floor2Stats = { 36, 9, 3, 70 };
 
 	// Floor 3
-	String[] floor3Enemies = { "Sorcerer", "Apprentice", "Mage", "Alchemist", "Thaumaturge" };
-	int[] floor3Stats = { 44, 12, 5, 76 };
+	private String[] floor3Enemies = { "Sorcerer", "Apprentice", "Mage", "Alchemist", "Thaumaturge" };
+	private int[] floor3Stats = { 44, 12, 5, 76 };
 
 	// Floor 4
-	String[] floor4Enemies = { "Assassin", "Bandit", "Mercenary", "Poison Master", "Thief" };
-	int[] floor4Stats = { 52, 16, 7, 82 };
+	private String[] floor4Enemies = { "Assassin", "Bandit", "Mercenary", "Poison Master", "Thief" };
+	private int[] floor4Stats = { 52, 16, 7, 82 };
 
 	// Floor 5
-	String[] floor5Enemies = { "Shieldbearer", "Knight", "Squire", "Crusader", "Spearman" };
-	int[] floor5Stats = { 60, 20, 9, 86 };
+	private String[] floor5Enemies = { "Shieldbearer", "Knight", "Squire", "Crusader", "Spearman" };
+	private int[] floor5Stats = { 60, 20, 9, 86 };
 
 	// Weapon List
 	String[] weaponNames = { "Rock", "Wooden Club", "Hatchet", "Mace", "Sword", "Halberd", "Great Hammer",
@@ -65,10 +65,87 @@ public class database {
 	String[] hiddenAmuletDesc = { "Amulet grants user +15 Accuracy", "Amulet grants user +3 Speed",
 			"Amulet grants user +10 Health", "Amulet grants user +12 Damage", "Amulet doubles user's gold rewards" };
 
+	// Get and Set Save File
 	public void setSave(String file) {
 		selectedSave = file;
 	}
 	public String getSave() {
 		return selectedSave;
+	}
+	
+	// Get and Set beatBoss
+	public void setBoss1(boolean bool) {
+		beatBoss1 = bool;
+	}
+	public void setBoss2(boolean bool) {
+		beatBoss1 = bool;
+	}
+	public void setBoss3(boolean bool) {
+		beatBoss1 = bool;
+	}
+	public void setBoss4(boolean bool) {
+		beatBoss1 = bool;
+	}
+	public void setBoss5(boolean bool) {
+		beatBoss1 = bool;
+	}
+	public boolean getBoss1() {
+		return beatBoss1;
+	}
+	public boolean getBoss2() {
+		return beatBoss2;
+	}
+	public boolean getBoss3() {
+		return beatBoss3;
+	}
+	public boolean getBoss4() {
+		return beatBoss4;
+	}
+	public boolean getBoss5() {
+		return beatBoss5;
+	}
+	
+	// Floor Enemies, Stats, and Numbers
+	public void setFloor(int newFloor) {
+		currentFloor = newFloor;
+	}
+	public int getFloor() {
+		return currentFloor;
+	}
+	public void setRoom(int newRoom) {
+		roomCounter = newRoom;
+	}
+	public int getRoom() {
+		return roomCounter;
+	}
+	public String[] getFloor1E() {
+		return floor1Enemies;
+	}
+	public int[] getFloor1S() {
+		return floor1Stats;
+	}
+	public String[] getFloor2E() {
+		return floor2Enemies;
+	}
+	public int[] getFloor2S() {
+		return floor2Stats;
+	}
+	public String[] getFloor3E() {
+		return floor3Enemies;
+	}
+	public int[] getFloor3S() {
+		return floor3Stats;
+	}
+	public String[] getFloor4E() {
+		return floor4Enemies;
+	}
+	public int[] getFloor4S() {
+		return floor4Stats;
+	}
+	public String[] getFloor5E() {
+		return floor5Enemies;
+	}
+	public int[] getFloor5S() {
+		return floor5Stats;
 	}
 }
